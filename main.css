@@ -1,0 +1,177 @@
+body {
+	background-image: radial-gradient(rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.3) 100%);
+	background-color: black;
+	transition: background-color 1s;
+	-webkit-transition: background-color 1s;
+	-moz-transition: background-color 1s;
+	-o-transition: background-color 1s;
+	font-size: 10px;
+	overflow: hidden;
+}
+
+#community {
+	position: absolute;
+	top: 72px;
+	left: 50%;
+}
+
+#player {
+	position: absolute;
+	bottom: 72px;
+	left: 50%;
+}
+
+.placeholder {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	display: block;
+	position: absolute;
+	width: 96px;
+	height: 96px;
+	font-family: Arial;
+	border-radius: 8px;
+	/*border: 1px solid rgba(0, 0, 0, 0.5);*/
+	background-color: rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 0px 4px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
+	animation: fade-in 1s;
+	-webkit-animation: fade-in 1s;
+	-moz-animation: fade-in 1s;
+	-o-animation: fade-in 1s;
+}
+@keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+@-webkit-keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+@-moz-keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+@-o-keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+.card {
+	display: block;
+	position: absolute;
+	/*left: -48px;
+	top: -48px;*/
+	width: 96px;
+	height: 96px;
+	font-family: Arial;
+	transition: left 1s, top 1s, bottom 1s, right 1s;
+	-webkit-transition: left 1s, top 1s, bottom 1s, right 1s;
+	-moz-transition: left 1s, top 1s, bottom 1s, right 1s;
+	-o-transition: left 1s, top 1s, bottom 1s, right 1s;
+}
+.card .front, .card .back {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 96px;
+	height: 96px;
+	border-radius: 8px;
+	background-color: white;
+	box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.5);
+}
+.card .front {
+	transition: opacity 0s linear 0.25s;
+	-webkit-transition: opacity 0s linear 0.25s;
+	-moz-transition: opacity 0s linear 0.25s;
+	-o-transition: opacity 0s linear 0.25s;
+}
+.card .front {
+	text-align: center;
+}
+.card .front > * {
+	vertical-align: middle;
+}
+.card .front .rank {
+	padding-top: 12px;
+	font-size: 7.2em;
+	line-height: 56px;
+}
+.card .front .suit {
+	font-size: 2.4em;
+	line-height: 24px;
+	padding-bottom: 4px;
+}
+.card .front .red {
+	color: red;
+}
+.card .front.suit-words .rank {
+	padding-top: 12px;
+	font-size: 7.2em;
+	line-height: 60px;
+}
+.card .front.suit-words .suit {
+	font-size: 1.2em;
+	line-height: 24px;
+	padding-bottom: 0px;
+}
+.card .back {
+	transition: opacity 0s linear 0.25s;
+	-webkit-transition: opacity 0s linear 0.25s;
+	-moz-transition: opacity 0s linear 0.25s;
+	-o-transition: opacity 0s linear 0.25s;
+	background-color: black;
+	border: 28px solid white;
+}
+@keyframes card-front-flip {
+	from { transform: perspective(500px) rotateY(180deg); }
+	to { transform: perspective(500px) rotateY(0deg); }
+}
+@keyframes card-back-flip {
+	from { transform: perspective(500px) rotateY(0deg); }
+	to { transform: perspective(500px) rotateY(-180deg); }
+}
+@-webkit-keyframes card-front-flip {
+	from { -webkit-transform: perspective(500px) rotateY(180deg); }
+	to { -webkit-transform: perspective(500px) rotateY(0deg); }
+}
+@-webkit-keyframes card-back-flip {
+	from { -webkit-transform: perspective(500px) rotateY(0deg); }
+	to { -webkit-transform: perspective(500px) rotateY(-180deg); }
+}
+@-moz-keyframes card-front-flip {
+	from { -moz-transform: perspective(500px) rotateY(180deg); }
+	to { -moz-transform: perspective(500px) rotateY(0deg); }
+}
+@-moz-keyframes card-back-flip {
+	from { -moz-transform: perspective(500px) rotateY(0deg); }
+	to { -moz-transform: perspective(500px) rotateY(-180deg); }
+}
+@-o-keyframes card-front-flip {
+	from { -o-transform: perspective(500px) rotateY(180deg); }
+	to { -o-transform: perspective(500px) rotateY(0deg); }
+}
+@-o-keyframes card-back-flip {
+	from { -o-transform: perspective(500px) rotateY(0deg); }
+	to { -o-transform: perspective(500px) rotateY(-180deg); }
+}
+.card:not(.flipped) .front {
+	opacity: 0;
+}
+.card:not(.flipped) .back {
+	opacity: 1;
+}
+.card.flipped .front {
+	animation: card-front-flip 0.5s linear 0s;
+	-webkit-animation: card-front-flip 0.5s linear 0s;
+	-moz-animation: card-front-flip 0.5s linear 0s;
+	-o-animation: card-front-flip 0.5s linear 0s;
+	opacity: 1;
+}
+.card.flipped .back {
+	animation: card-back-flip 0.5s linear 0s;
+	-webkit-animation: card-back-flip 0.5s linear 0s;
+	-moz-animation: card-back-flip 0.5s linear 0s;
+	-o-animation: card-back-flip 0.5s linear 0s;
+	opacity: 0;
+}
