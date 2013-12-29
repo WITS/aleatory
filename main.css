@@ -78,11 +78,16 @@ body {
 	height: 96px;
 	border-radius: 8px;
 	background-color: white;
+}
+.card:not(.flipped) > * {
 	box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.5);
+}
+.card.flipped > * {
+	box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.5);
 }
 .card .front {
 	transition: opacity 0s linear 0.25s;
-	-webkit-transition: opacity 0s linear 0.25s;
+	-webkit-transition: box-shadow 1s, opacity 0s linear 0.25s;
 	-moz-transition: opacity 0s linear 0.25s;
 	-o-transition: opacity 0s linear 0.25s;
 }
