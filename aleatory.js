@@ -10,13 +10,28 @@ window.addEventListener("load", function() {
 		co_elem.appendChild(elem);
 	}
 	var pl_elem = document.getElementById("player");
-	// for (var i = 0, left = -228; i < 4; i ++, left += 120) {
 	for (var i = 0, left = -108; i < 2; i ++, left += 120) {
 		// Player
 		var elem = new Placeholder().element();
 		elem.style.left = (left) + "px";
 		pl_elem.appendChild(elem);
 	}
+	// Hand objects
+	hands = new Array();
+	player = new Hand({
+		elementId: "player",
+		name: "Player",
+		position: "bottom"
+	});
+	hands.push(player);
+	hands.push(new Hand({
+		name: "Left",
+		position: "left"
+	}));
+	hands.push(new Hand({
+		name: "Right",
+		position: "right"
+	}));
 	current_round = new Round();
 	setTimeout(function() {
 		current_round.start();
@@ -248,21 +263,32 @@ function Chip(from) {
 	}
 	var r_hor = -18 + choose(-1, 1) * (48 + irandom(64));
 	var r_ver = -18 + choose(-1, 1) * (48 + irandom(64));
+	var r_rot = 6 * irandom(60);
 	switch (from) {
+		case "left": elem.style.left = (r_hor - window.innerWidth - 400) + "px"; elem.style.top = r_ver + "px"; break;
+		case "right": elem.style.left = (r_hor + window.innerWidth + 400) + "px"; elem.style.top = r_ver + "px"; break;
 		case "bottom": elem.style.left = (r_hor) + "px"; elem.style.top = (r_ver + window.innerHeight + 400) + "px"; break;
 		default: break;
 	}
+	elem.style.transform = "rotate(-" + (r_rot * 3) + "deg)";
+	elem.style.webkitTransform = "rotate(-" + (r_rot * 3) + "deg)";
+	elem.style.mozTransform = "rotate(-" + (r_rot * 3) + "deg)";
+	elem.style.oTransform = "rotate(-" + (r_rot * 3) + "deg)";
 	document.getElementById("pot").appendChild(elem);
 	setTimeout(function() {
 		elem.style.left = r_hor + "px";
 		elem.style.top = r_ver + "px";
+		elem.style.transform = "rotate(" + r_rot + "deg)";
+		elem.style.webkitTransform = "rotate(" + r_rot + "deg)";
+		elem.style.mozTransform = "rotate(" + r_rot + "deg)";
+		elem.style.oTransform = "rotate(" + r_rot + "deg)";
 	}, 100);
 }
 
 function Round() {
 	this.deck = new Deck();
 	this.community = new Array();
-	this.hands = new Array();
+	this.hands = hands;
 	this.deal = function() {
 		var c_id = this.community.length;
 		var card = this.deck.draw();
@@ -292,18 +318,19 @@ function Round() {
 		for (var i = 0; i < 3; i ++) {
 			this.deal();
 		}
-		player = new Hand({
-			elementId: "player",
-			position: "bottom"
-		});
 		var _this = this;
 		setTimeout(function() {
-			player.draw();
-			player.draw();
-			player.raiseBid();
+			var span = document.createElement("span");
+			span.innerHTML = "$0";
+			document.getElementById("pot-total").appendChild(span);
+			for (var x = 0, y = _this.hands.length; x < y; x ++) {
+				var _hand = _this.hands[x];
+				_hand.draw();
+				_hand.draw();
+				_hand.raiseBid();
+			}
 			setTimeout(function() {
 				player.showHand();
-				_this.hands.push(player);
 				_this.next_bidder();
 				// Create buttons
 				var pl_elem = document.getElementById("player");
@@ -318,9 +345,9 @@ function Round() {
 						player.fold();
 					}
 				}
-				this.bidLeft = _this1.element();
-				this.bidLeft.style.left = "-228px";
-				pl_elem.appendChild(this.bidLeft);
+				_this.bidLeft = _this1.element();
+				_this.bidLeft.style.left = "-228px";
+				pl_elem.appendChild(_this.bidLeft);
 				var _this2 = new BidButton({
 					left_text: "raise",
 					right_text: "match"
@@ -332,15 +359,78 @@ function Round() {
 						player.matchBid();
 					}
 				}
-				this.bidRight = _this2.element();
-				this.bidRight.style.left = "132px";
-				pl_elem.appendChild(this.bidRight);
+				_this.bidRight = _this2.element();
+				_this.bidRight.style.left = "132px";
+				pl_elem.appendChild(_this.bidRight);
 				update_bg_color();
 			}, 1000);
 		}, 500);
 	}
-	this.clear = function() {
-
+	this.clear = function(pot_dir) {
+		var pot_dir = pot_dir || "bottom";
+		var elems = document.getElementById("community").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			if (elems[x].className != "placeholder") {
+				elems[x].style.left = "0px";
+				elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
+			}
+		}
+		var elems = document.getElementById("card-results").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].style.left = "0px";
+			elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
+		}
+		var elems = document.getElementById("text-results").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].style.left = "0px";
+			elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
+		}
+		var elems = document.getElementById("pot").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			if (pot_dir == "bottom") {
+				elems[x].style.left = "0px";
+				elems[x].style.top = (window.innerHeight / 2 + 100 + irandom(300)) + "px";
+			} else {
+				elems[x].style.left = ((pot_dir == "left" ? -1 : 1) * (window.innerWidth / 2 + 100 + irandom(300))) + "px";
+				elems[x].style.top = "0px";
+			}
+		}
+		// Clear hands
+		for (var x = 0, y = hands.length; x < y; x ++) {
+			hands[x].cards = new Array();
+			hands[x].bid = 0;
+		}
+		// Clear elements
+		var pot_total = document.getElementById("pot-total");
+		pot_total.removeChild(pot_total.children[0]);
+		setTimeout(function() {
+			var community = document.getElementById("community");
+			var elems = community.children;
+			for (var x = 0, y = elems.length; x < y; x ++) {
+				if (elems[x].className != "placeholder") {
+					community.removeChild(elems[x]);
+					x --;
+					y --;
+				}
+			}
+			var text_results = document.getElementById("text-results");
+			var elems = text_results.children;
+			while (elems.length) {
+				text_results.removeChild(elems[0]);
+			}
+			var card_results = document.getElementById("card-results");
+			var elems = card_results.children;
+			while (elems.length) {
+				card_results.removeChild(elems[0]);
+			}
+			var pot = document.getElementById("pot");
+			var elems = pot.children;
+			while (elems.length) {
+				pot.removeChild(elems[0]);
+			}
+			current_round = new Round();
+			current_round.start();
+		}, 1000);
 	}
 	this.pot = 0;
 	this.highestBid = 0;
@@ -359,6 +449,10 @@ function Round() {
 			this.current_bidder ++;
 		}
 		if (this.current_bidder < this.hands.length) {
+			if (this.hands[this.current_bidder].folded) {
+				this.next_bidder();
+				return;
+			}
 			if (this.hands[this.current_bidder] != player) {
 				this.hands[this.current_bidder].auto_bid();
 			}
@@ -373,11 +467,25 @@ function Round() {
 				var winners = new Array();
 				for (var x = 0, y = this.hands.length; x < y; x ++) {
 					winners.push(get_highest_hand(this.hands[x].cards.concat(this.community)));
+					winners[x].id = x;
+					winners[x].name = hands[x].name;
 				}
 				winners = winners.sort(function(a, b) {
-					return b.rank - a.rank;
+					if (hands[a.id].folded && !hands[b.id].folded) {
+						return 100000;
+					} else if (!hands[a.id].folded && hands[b.id].folded) {
+						return -100000;
+					}
+					return a.rank - b.rank;
 				});
 				console.log(winners);
+				var pl_elem = document.getElementById("player");
+				pl_elem.removeChild(this.bidLeft);
+				pl_elem.removeChild(this.bidRight);
+				hide_player_cards();
+				setTimeout(function() {
+					display_winners(winners);
+				}, 500);
 			}
 		}
 	}
@@ -392,6 +500,7 @@ function Hand(h) {
 	this.money = 50;
 	this.bid = 0;
 	this.staying = false;
+	this.folded = false;
 	this.elementId = h.elementId || null;
 	if (this.elementId != null) {
 		this.element = document.getElementById(this.elementId);
@@ -399,6 +508,7 @@ function Hand(h) {
 		this.element = null;
 	}
 	this.element = h.element || this.element;
+	this.name = h.name || "";
 	this.position = h.position || "";
 	this.reset = function() {
 		this.cards = new Array();
@@ -436,11 +546,15 @@ function Hand(h) {
 		current_round.next_bidder();
 	}
 	this.fold = function() {
+		this.folded = true;
+		console.log("FOLDER!");
 		current_round.next_bidder();
 	}
 	this.matchBid = function() {
 		var raise = current_round.highestBid - this.bid;
-		this.raiseBid(raise);
+		if (raise >= 1) {
+			this.raiseBid(raise);
+		}
 	}
 	this.raiseBid = function(x) {
 		var x = x || 1;
@@ -450,8 +564,11 @@ function Hand(h) {
 		current_round.pot += x;
 		// Pot thangs
 		document.getElementById("pot-total").children[0].innerHTML = "$" + current_round.pot;
+		var _this = this;
 		for (var y = 0; y < x; y ++) {
-			new Chip("bottom");
+			setTimeout(function() {
+				new Chip(_this.position);
+			}, y * 500);
 		}
 		if (this.money == 0) {
 			// ALL IN!
@@ -463,10 +580,96 @@ function Hand(h) {
 			current_round.raised = true;
 		}
 		bid_buttons_set_right(current_round.highestBid > player.bid);
+		update_bg_color();
 	}
 	this.fold = function() {
 		this.folded = true;
 	}
+	this.auto_bid = function() {
+		console.log("Entering auto-bid");
+		var best_hand = get_highest_hand;
+		var max_bid = 2 + irandom(1);
+		var max_match = 3;
+		var bid_list = [1, 10, 166, 322, 1599, 1609, 2467, 3325, 6185];
+		for (var x = 0, y = bid_list.length; x < y; x ++) {
+			if (best_hand.rank <= bid_list[x]) {
+				max_bid += 3;
+				max_match += 4;
+			}
+		}
+		console.log(current_round);
+		if (current_round.highestBid <= max_match) {
+			console.log("Match");
+			this.matchBid();
+		} else {
+			console.log("Fold");
+			this.fold();
+		}
+		if (irandom(45 / current_round.community.length - max_match) <= 0 && current_round.highestBid < max_bid) {
+			var raise = irandom(max_bid - current_round.highestBid + 1);
+			if (raise) {
+				this.raiseBid();
+			}
+		}
+		this.check();
+	}
+}
+
+function hide_player_cards() {
+	var cards = player.cards;
+	for (var i = 0; i < cards.length; i ++) {
+		cards[i].element().style.top = (window.innerHeight + 120) + "px";
+	}
+}
+
+function display_winners(w) {
+	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 160, x = -x) {
+		var text = document.createElement("div");
+		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i>";
+		text.style.top = (y) + "px";
+		document.getElementById("text-results").appendChild(text);
+		var hand = hands[w[i].id];
+		var card1 = hand.cards[0].element();
+		if (card1.parentElement != null) {
+			card1.parentElement.removeChild(card1);
+		}
+		card1.style.left = (x - 108) + "px";
+		card1.style.top = (y + 40) + "px";
+		document.getElementById("card-results").appendChild(card1);
+		var card2 = hand.cards[1].element();
+		if (card2.parentElement != null) {
+			card2.parentElement.removeChild(card2);
+		}
+		card2.style.left = (x + 12) + "px";
+		card2.style.top = (y + 40) + "px";
+		document.getElementById("card-results").appendChild(card2);
+	}
+	setTimeout(function() {
+		var elems = document.getElementById("card-results").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].style.left = (x % 2 == 1 ? "-108px" : "12px");
+		}
+	}, 1);
+	setTimeout(function() {
+		var elems = document.getElementById("card-results").children;
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].classList.add("flipped");
+		}
+	}, 500);
+	var _this2 = new BidButton({
+		left_text: "next",
+		right_text: "next"
+	});
+	_this2.onclick = function() {
+		var winner = hands[w[0].id];
+		winner.money += current_round.pot;
+		current_round.clear(winner.position);
+		_this2.element().parentElement.removeChild(_this2.element());
+	}
+	var bidRight = _this2.element();
+	bidRight.style.left = "132px";
+	document.getElementById("player").appendChild(bidRight);
+	update_bg_color();
 }
 
 function hand_query(q) {
@@ -478,14 +681,12 @@ function hand_query(q) {
 	} else if (rankQuery == null) {
 		rankQuery = /^.*$/i;
 	}
-	// console.log(rankQuery);
 	var suitQuery = q.suit;
 	if (typeof suitQuery === 'string') {
 		suitQuery = new RegExp("^(?:" + suitQuery.replace(/\s+/g, "|") + ")$", "i");
 	} else if (suitQuery == null) {
 		suitQuery = /^.*$/i;
 	}
-	// console.log(suitQuery);
 	var matches = new Array();
 	for (var c = 0; c < cards.length; c ++) {
 		var card = cards[c];
@@ -499,7 +700,6 @@ function hand_query(q) {
 		matches: matches,
 		others: cards
 	};
-	// console.log(result);
 	return result;
 }
 
@@ -535,7 +735,6 @@ function get_straight_flushes(cards) {
 		royal_matches: royal_matches,
 		matches: matches
 	}
-	// console.log(result);
 	return result;
 }
 
@@ -562,7 +761,6 @@ function get_straights(cards) {
 	var result = {
 		matches: matches
 	}
-	// console.log(result);
 	return result;
 }
 
@@ -750,21 +948,8 @@ function get_highest_hand(cards) {
 	// Flush (323 - 1599)
 	if (c_result.matches.length) {
 		hand = sort_cards(c_result.matches[0]).splice(0, 5);
-		// var offsets = new Array();
-		// offsets[0] = [0, 164, ];
-		// offsets[1] = [493, 329, 209, 125, 69, 34, 14, 4];
-		// offsets[2] = [329];
-		// offsets[3] = [209];
-		// offsets[4] = [125];
-		// offsets[5] = [69];
-		// offsets[6] = [34];
-		// offsets[7] = [14];
-		// offsets[8] = [4];
-		// var rank_x1 = 0;
 		for (var x = 0; x < 8; x ++) {
 			if (rank_list[x] == hand[0].rankStr) {
-				// rank_x1 = x;
-				// rank += offsets[0][x];
 				title = (rank_list[x][0].toUpperCase() + rank_list[x].substr(1)) + "-High Flush";
 				break;
 			}
@@ -792,17 +977,6 @@ function get_highest_hand(cards) {
 				break;
 			}
 		}
-		// var rank_x2 = 0;
-		// for (var x = 0; x < 13; x ++) {
-		// 	if (rank_list[x] == hand[0].rankStr) {
-		// 		rank_x2 = x;
-		// 		if (x < rank_x1) {
-		// 			rank += 1;
-		// 		}
-		// 		rank += x * 493;
-		// 		break;
-		// 	}
-		// }
 		return {
 			rank: rank,
 			title: title,
@@ -878,7 +1052,6 @@ function get_highest_hand(cards) {
 	if (like_ranks.pairs.length >= 2) {
 		var c_groups = sort_groups(like_ranks.pairs).splice(0, 2);
 		hand = c_groups[0].concat(c_groups[1]);
-		// var offset_list = [0, 132, 121, 111, 102, 94, 87, 81, 76, 72, 69, 67, 66];
 		var offset_list = [0, 132, 253, 364, 466, 560, 647, 728, 804, 876, 945, 1012, 1078];
 		var rank_x = 0;
 		for (var x = 0; x < 13; x ++) {
@@ -889,7 +1062,6 @@ function get_highest_hand(cards) {
 				break;
 			}
 		}
-		// var offset_list2 = [0, 11, 21, 30, 38, 45, 51, 56, 60, 63, 65];
 		var rank_x2 = 0;
 		for (var x = 0; x < 13; x ++) {
 			if (rank_list[x] == hand[2].rankStr) {
@@ -942,7 +1114,6 @@ function get_highest_hand(cards) {
 			rank: hand[0].rankStr
 		}).others);
 		kickers.splice(3);
-		// var offset_list = [0, 55, 45, 36, 28, 21, 15, 10, 6, 3, 1, 0];
 		var offset_list = [0, 55, 100, 136, 164, 185, 200, 210, 216, 219, 220];
 		var rank_x2 = 0;
 		for (var x = 0; x < 13; x ++) {
@@ -953,7 +1124,6 @@ function get_highest_hand(cards) {
 			}
 		}
 		hand.push(kickers[0]);
-		// var offset_list2 = [0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 		var offset_list2 = [0, 10, 19, 27, 34, 40, 45, 49, 52, 54, 55];
 		var rank_x3 = 0;
 		for (var x = 0; x < 13; x ++) {
@@ -998,14 +1168,6 @@ function get_highest_hand(cards) {
 			break;
 		}
 	}
-	// for (var z = 1; z < 5; z ++) {
-	// 	for (var x = 0; x < 13; x ++) {
-	// 		if (rank_list[x] == hand[z].rankStr) {
-	// 			rank += x;
-	// 			break;
-	// 		}
-	// 	}
-	// }
 	for (var x = 0, y = high_card_ranks.length; x < y; x ++) {
 		var hc_rank = high_card_ranks[x];
 		var rank_str = "";
@@ -1082,15 +1244,16 @@ var high_card_ranks = ["AKQJ9", "AKQJ8", "AKQJ7", "AKQJ6", "AKQJ5", "AKQJ4", "AK
 // 		rank: irandom(6) + 8
 // 	}));
 // }
-test_hand = new Array();
-var yo = new Deck();
-yo.shuffle();
-while(test_hand.length < 7) {
-	var _card = yo.draw();
-	test_hand.push(_card);
-	console.log(_card.toString());
-}
-console.log(get_highest_hand(test_hand));
+
+// test_hand = new Array();
+// var yo = new Deck();
+// yo.shuffle();
+// while(test_hand.length < 7) {
+// 	var _card = yo.draw();
+// 	test_hand.push(_card);
+// 	console.log(_card.toString());
+// }
+// console.log(get_highest_hand(test_hand));
 
 var yo = new Deck();
 full_deck = new Array();
