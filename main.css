@@ -21,6 +21,45 @@ body {
 	left: 50%;
 }
 
+#pot {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+#pot-total {
+	position: absolute;
+	left: 0px;
+	top: 50%;
+	text-align: center;
+	width: 100%;
+	font-family: Arial;
+	text-shadow: 0px -1px 1px rgba(0, 0, 0, 0.5), 0px 1px 1px rgba(255, 255, 255, 0.2);
+	transition: color 1s;
+	-webkit-transition: color 1s;
+	-moz-transition: color 1s;
+	-o-transition: color 1s;
+	animation: fade-in 1s;
+	-webkit-animation: fade-in 1s;
+	-moz-animation: fade-in 1s;
+	-o-animation: fade-in 1s;
+}
+#pot-total > span {
+	display: block;
+	position: absolute;
+	top: -24px;
+	width: 100%;
+	line-height: 48px;
+	font-size: 4.8em;
+}
+
+.placeholder, .bid-button, .card, #pot, #pot-total {
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 .placeholder {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -37,6 +76,69 @@ body {
 	-webkit-animation: fade-in 1s;
 	-moz-animation: fade-in 1s;
 	-o-animation: fade-in 1s;
+}
+.bid-button {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	display: block;
+	position: absolute;	
+	overflow: hidden;
+	width: 96px;
+	height: 96px;
+	font-family: Arial;
+	border-radius: 8px;
+	padding: 4px;
+	background-color: rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 0px 4px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	transition: color 1s, background-color 0.15s, box-shadow 0.15s;
+	-webkit-transition: color 1s, background-color 0.15s, box-shadow 0.15s;
+	-moz-transition: color 1s, background-color 0.15s, box-shadow 0.15s;
+	-o-transition: color 1s, background-color 0.15s, box-shadow 0.15s;
+	animation: fade-in 1s ease-in;
+	-webkit-animation: fade-in 1s ease-in;
+	-moz-animation: fade-in 1s ease-in;
+	-o-animation: fade-in 1s ease-in;
+}
+.bid-button:hover:not(:active) {
+	/*border-color: rgba(255, 255, 255, 0.7);*/
+	/*box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.3);*/
+	background-color: rgba(0, 0, 0, 0);
+	box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.5);
+}
+.bid-button > .inner {
+	width: 88px;
+	height: 88px;
+	position: relative;
+	left: 0px;
+	top: 0px;
+	transition: top 0.5s;
+	-webkit-transition: top 0.5s;
+	-moz-transition: top 0.5s;
+	-o-transition: top 0.5s;
+}
+.bid-button.right > .inner {
+	top: -88px;
+}
+.bid-button > .inner > * {
+	width: 88px;
+	height: 88px;
+}
+.bid-button > .inner > * > * {
+	text-align: center;
+	vertical-align: middle;
+	text-transform: uppercase;
+	/*color: white;*/
+}
+.bid-button .letter {
+	line-height: 56px;
+	font-size: 5.6em;
+	text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+}
+.bid-button .text {
+	line-height: 32px;
+	font-size: 2.4em;
+	text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
 }
 @keyframes fade-in {
 	from { opacity: 0; }
@@ -179,4 +281,11 @@ body {
 	-moz-animation: card-back-flip 0.5s linear 0s;
 	-o-animation: card-back-flip 0.5s linear 0s;
 	opacity: 0;
+}
+
+.chip {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.5);
 }
