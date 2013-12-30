@@ -399,6 +399,8 @@ function Round() {
 		for (var x = 0, y = hands.length; x < y; x ++) {
 			hands[x].cards = new Array();
 			hands[x].bid = 0;
+			hands[x].checking = false;
+			hands[x].folded = false;
 		}
 		// Clear elements
 		var pot_total = document.getElementById("pot-total");
@@ -505,7 +507,6 @@ function Hand(h) {
 		var h = new Object();
 	}
 	this.cards = new Array();
-	this.folded = false;
 	this.money = 50;
 	this.bid = 0;
 	this.staying = false;
