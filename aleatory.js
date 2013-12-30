@@ -592,8 +592,9 @@ function Hand(h) {
 		current_round.next_bidder();
 	}
 	this.auto_bid = function() {
-		console.log("Entering auto-bid");
+		// console.log("Entering auto-bid");
 		var best_hand = get_highest_hand;
+		var min_bid = 1;
 		var max_bid = 2 + irandom(1);
 		var max_match = 3;
 		var bid_list = [1, 10, 166, 322, 1599, 1609, 2467, 3325, 6185];
@@ -601,14 +602,16 @@ function Hand(h) {
 			if (best_hand.rank <= bid_list[x]) {
 				max_bid += 3;
 				max_match += 4;
+				if (x <= 5) {
+					min_bid += 2;
+				}
 			}
 		}
-		console.log(current_round);
 		if (current_round.highestBid <= max_match) {
-			console.log("Match");
+			// console.log("Match");
 			this.matchBid();
 		} else {
-			console.log("Fold");
+			// console.log("Fold");
 			this.fold();
 		}
 		if (irandom(45 / current_round.community.length - max_match) <= 0 && current_round.highestBid < max_bid) {
@@ -616,6 +619,9 @@ function Hand(h) {
 			if (raise) {
 				this.raiseBid();
 			}
+		}
+		if (current_round.highestBid < min_bid) {
+			this.raiseBid(current_round.highestBid - min_bid);
 		}
 		this.check();
 	}
@@ -1265,4 +1271,9 @@ var yo = new Deck();
 full_deck = new Array();
 while(yo.cards.length > 0) {
 	full_deck.push(yo.draw());
+}
+
+function handle_speech(elem) {
+	var val = elem.value.trim();
+	elem.value = "";
 }
