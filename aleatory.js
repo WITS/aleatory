@@ -450,6 +450,15 @@ function Round() {
 		}
 		if (this.current_bidder < this.hands.length) {
 			if (this.hands[this.current_bidder].folded) {
+				var f_count;
+				for (var x = 0, y = this.hands.length; x < y; x ++) {
+					if (this.hands[x].folded) {
+						f_count ++;
+					}
+				}
+				if (f_count == this.hands.length - 1) {
+					this.current_bidder = this.hands.length;
+				}
 				this.next_bidder();
 				return;
 			}
@@ -545,11 +554,6 @@ function Hand(h) {
 		this.checking = true;
 		current_round.next_bidder();
 	}
-	this.fold = function() {
-		this.folded = true;
-		console.log("FOLDER!");
-		current_round.next_bidder();
-	}
 	this.matchBid = function() {
 		var raise = current_round.highestBid - this.bid;
 		if (raise >= 1) {
@@ -584,6 +588,7 @@ function Hand(h) {
 	}
 	this.fold = function() {
 		this.folded = true;
+		current_round.next_bidder();
 	}
 	this.auto_bid = function() {
 		console.log("Entering auto-bid");
