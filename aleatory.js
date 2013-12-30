@@ -241,7 +241,22 @@ function Deck() {
 }
 
 function Chip(from) {
-
+	var elem = document.createElement("div");
+	elem.className = "chip";
+	if (/AppleWebKit/.test(navigator.userAgent) && !/Mobile/.test(navigator.userAgent)) {
+		elem.className += " webkit";
+	}
+	var r_hor = -18 + choose(-1, 1) * (48 + irandom(64));
+	var r_ver = -18 + choose(-1, 1) * (48 + irandom(64));
+	switch (from) {
+		case "bottom": elem.style.left = (r_hor) + "px"; elem.style.top = (r_ver + window.innerHeight + 400) + "px"; break;
+		default: break;
+	}
+	document.getElementById("pot").appendChild(elem);
+	setTimeout(function() {
+		elem.style.left = r_hor + "px";
+		elem.style.top = r_ver + "px";
+	}, 100);
 }
 
 function Round() {
@@ -433,8 +448,11 @@ function Hand(h) {
 		this.money -= x;
 		this.bid += x;
 		current_round.pot += x;
-		// Create pot thang
+		// Pot thangs
 		document.getElementById("pot-total").children[0].innerHTML = "$" + current_round.pot;
+		for (var y = 0; y < x; y ++) {
+			new Chip("bottom");
+		}
 		if (this.money == 0) {
 			// ALL IN!
 			// Uh... Do something...
