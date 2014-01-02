@@ -380,3 +380,22 @@ body {
 	border: 2px inset rgba(0, 0, 0, 0.5);
 	background-color: whitesmoke;
 }
+
+#speech-input {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	display: block;
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	background-color: white;
+	color: transparent;
+	border: none;
+	font-size: 3.2em;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	padding: 6px 0px 6px 6px;
+	outline: none;
+	box-shadow: inset 0px 2px 4px 0px black;
+}

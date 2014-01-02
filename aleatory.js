@@ -635,7 +635,7 @@ function hide_player_cards() {
 }
 
 function display_winners(w) {
-	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 160, x = -x) {
+	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 144, x = -x) {
 		var text = document.createElement("div");
 		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i>";
 		text.style.top = (y) + "px";
