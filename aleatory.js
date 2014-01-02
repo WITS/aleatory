@@ -474,6 +474,13 @@ function Round() {
 				this.current_bidder = -1;
 				this.next_bidder();
 			} else {
+				// Remove bid buttons
+				if (this.bidLeft.parentElement != null) {
+					this.bidLeft.remove();
+				}
+				if (this.bidRight.parentElement != null) {
+					this.bidRight.remove();
+				}
 				// Find best hand and give them the pot
 				var winners = new Array();
 				for (var x = 0, y = this.hands.length; x < y; x ++) {
@@ -489,10 +496,7 @@ function Round() {
 					}
 					return a.rank - b.rank;
 				});
-				console.log(winners);
-				var pl_elem = document.getElementById("player");
-				pl_elem.removeChild(this.bidLeft);
-				pl_elem.removeChild(this.bidRight);
+				// console.log(winners);
 				hide_player_cards();
 				setTimeout(function() {
 					display_winners(winners);
@@ -635,6 +639,9 @@ function hide_player_cards() {
 }
 
 function display_winners(w) {
+	if (document.getElementById("text-results").children.length > 0) {
+		return;
+	}
 	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 144, x = -x) {
 		var text = document.createElement("div");
 		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i>";
@@ -676,7 +683,7 @@ function display_winners(w) {
 		var winner = hands[w[0].id];
 		winner.money += current_round.pot;
 		current_round.clear(winner.position);
-		_this2.element().parentElement.removeChild(_this2.element());
+		_this2.element().remove();
 	}
 	var bidRight = _this2.element();
 	bidRight.style.left = "132px";
