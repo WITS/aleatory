@@ -18,16 +18,20 @@ window.addEventListener("load", function() {
 	}
 	// Hand objects
 	hands = new Array();
+	hands.push(new Hand({
+		name: "Left",
+		position: "left"
+	}));
 	player = new Hand({
 		elementId: "player",
 		name: "Player",
 		position: "bottom"
 	});
 	hands.push(player);
-	hands.push(new Hand({
-		name: "Left",
-		position: "left"
-	}));
+	// hands.push(new Hand({
+	// 	name: "Dream",
+	// 	position: "bottom"
+	// }));
 	hands.push(new Hand({
 		name: "Right",
 		position: "right"
@@ -82,12 +86,17 @@ function BidButton(b) {
 	}
 	this.elementObj = null;
 	this.element = function() {
+		var _this = this;
 		if (this.elementObj == null) {
 			var elem = document.createElement("div");
 			elem.className = "bid-button";
 			elem.style.left = "-48px";
 			elem.style.top = "-48px";
-			elem.addEventListener("click", this.onclick);
+			elem.addEventListener("click", function() {
+				if (current_round.canBid) {
+					_this.onclick();
+				}
+			});
 			var inner = document.createElement("div");
 			inner.className = "inner";
 			var left = document.createElement("div");
@@ -130,6 +139,21 @@ function bid_buttons_set_right(right) {
 	} else {
 		for (var x = 0, y = elems.length; x < y; x ++) {
 			elems[x].classList.remove("right");
+		}
+	}
+}
+function bid_buttons_set_active(active) {
+	if (active == null) {
+		var active = true;
+	}
+	var elems = document.getElementsByClassName("bid-button");
+	if (!active) {
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].classList.add("show-none");
+		}
+	} else {
+		for (var x = 0, y = elems.length; x < y; x ++) {
+			elems[x].classList.remove("show-none");
 		}
 	}
 }
@@ -289,7 +313,9 @@ function Round() {
 	this.deck = new Deck();
 	this.community = new Array();
 	this.hands = hands;
+	this.candBid = false;
 	this.deal = function() {
+		this.canBid = false;
 		var c_id = this.community.length;
 		var card = this.deck.draw();
 		this.community.push(card);
@@ -362,6 +388,7 @@ function Round() {
 				_this.bidRight = _this2.element();
 				_this.bidRight.style.left = "132px";
 				pl_elem.appendChild(_this.bidRight);
+				bid_buttons_set_active(false);
 				update_bg_color();
 			}, 1000);
 		}, 500);
@@ -440,39 +467,69 @@ function Round() {
 	this.raised = false;
 	this.next_bidder = function() {
 		// Have dem previous peeps matched the current bid?
-		if (this.raised) {
-			this.raised = false;
-			if (this.current_bidder != 0) {
-				this.current_bidder = 0;
-			} else {
-				this.current_bidder ++;
-			}
-		} else {
-			this.current_bidder ++;
-		}
+		// if (this.raised) {
+		// 	this.raised = false;
+		// 	if (this.current_bidder != 0) {
+		// 		this.current_bidder = 0;
+		// 	} else {
+		// 		this.current_bidder ++;
+		// 	}
+		// } else {
+		// 	this.current_bidder ++;
+		// }
+		this.current_bidder ++;
 		if (this.current_bidder < this.hands.length) {
-			if (this.hands[this.current_bidder].folded) {
-				var f_count;
-				for (var x = 0, y = this.hands.length; x < y; x ++) {
-					if (this.hands[x].folded) {
-						f_count ++;
-					}
+			var f_count;
+			for (var x = 0, y = this.hands.length; x < y; x ++) {
+				if (this.hands[x].folded) {
+					f_count ++;
 				}
-				if (f_count == this.hands.length - 1) {
-					this.current_bidder = this.hands.length;
-				}
+			}
+			if (f_count == this.hands.length - 1) {
+				this.current_bidder = this.hands.length;
 				this.next_bidder();
 				return;
 			}
-			if (this.hands[this.current_bidder] != player) {
-				this.hands[this.current_bidder].auto_bid();
+			if (this.hands[this.current_bidder].folded) {
+				this.next_bidder();
+				return;
+			}
+			if (this.raised && this.hands[this.current_bidder].bid == this.highestBid) {
+				this.current_bidder = this.hands.length;
+				this.next_bidder();
+				return;
+			}
+			if (this.hands[this.current_bidder] == player) {
+				bid_buttons_set_active(true);
+				this.canBid = true;
+				bid_buttons_set_right(this.highestBid > player.bid);
+			} else {
+				bid_buttons_set_active(false);
+				this.canBid = false;
+				var _this = this;
+				setTimeout(function() {
+					_this.hands[_this.current_bidder].auto_bid();
+				}, 500);
 			}
 		} else {
+			// Check to see if everyone in is at the current bid
+			for (var x = 0, y = this.hands.length; x < y; x ++) {
+				if (!this.hands[x].folded && this.hands[x].bid < this.highestBid) {
+					this.current_bidder = -1;
+					this.next_bidder();
+					return;
+				}
+			}
+			this.raised = false;
 			if (this.community.length < 5) {
 				// Continue to next round
 				this.deal();
-				this.current_bidder = -1;
-				this.next_bidder();
+				this.canBid = false;
+				var _this = this;
+				setTimeout(function() {
+					_this.current_bidder = -1;
+					_this.next_bidder();
+				}, 1500);
 			} else {
 				// Remove bid buttons
 				if (this.bidLeft.parentElement != null) {
@@ -493,6 +550,12 @@ function Round() {
 						return 100000;
 					} else if (!hands[a.id].folded && hands[b.id].folded) {
 						return -100000;
+					} else if (a.rank == b.rank) {
+						if (hands[a.id] == player) {
+							return -100000;
+						} else {
+							return 100000;
+						}
 					}
 					return a.rank - b.rank;
 				});
@@ -515,6 +578,7 @@ function Hand(h) {
 	this.bid = 0;
 	this.staying = false;
 	this.folded = false;
+	this.bidding = false;
 	this.elementId = h.elementId || null;
 	if (this.elementId != null) {
 		this.element = document.getElementById(this.elementId);
@@ -564,6 +628,9 @@ function Hand(h) {
 		if (raise >= 1) {
 			this.raiseBid(raise);
 		}
+		if (this == player) {
+			bid_buttons_set_right(false);
+		}
 	}
 	this.raiseBid = function(x) {
 		var x = x || 1;
@@ -572,6 +639,7 @@ function Hand(h) {
 		this.bid += x;
 		current_round.pot += x;
 		// Pot thangs
+		this.bidding = true;
 		document.getElementById("pot-total").children[0].innerHTML = "$" + current_round.pot;
 		var _this = this;
 		for (var y = 0; y < x; y ++) {
@@ -579,6 +647,9 @@ function Hand(h) {
 				new Chip(_this.position);
 			}, y * 500);
 		}
+		setTimeout(function() {
+			_this.bidding = false;
+		}, x * 500);
 		if (this.money == 0) {
 			// ALL IN!
 			// Uh... Do something...
@@ -588,46 +659,75 @@ function Hand(h) {
 			current_round.highestBid = this.bid;
 			current_round.raised = true;
 		}
-		bid_buttons_set_right(current_round.highestBid > player.bid);
 		update_bg_color();
 	}
 	this.fold = function() {
 		this.folded = true;
 		current_round.next_bidder();
-	}
-	this.auto_bid = function() {
-		// console.log("Entering auto-bid");
-		var best_hand = get_highest_hand;
-		var min_bid = 1;
-		var max_bid = 2 + irandom(1);
-		var max_match = 3;
-		var bid_list = [1, 10, 166, 322, 1599, 1609, 2467, 3325, 6185];
-		for (var x = 0, y = bid_list.length; x < y; x ++) {
-			if (best_hand.rank <= bid_list[x]) {
-				max_bid += 3;
-				max_match += 4;
-				if (x <= 5) {
-					min_bid += 2;
+		if (this == player) {
+			// Hide the bidding buttons
+			for (var x = 0, elems = document.getElementById("player").children, y = elems.length; x < y; x ++) {
+				if (elems[x].classList.contains("bid-button")) {
+					elems[x].style.opacity = "0";
+				} else if (elems[x].classList.contains("card")) {
+					elems[x].style.top = "400px";
 				}
 			}
 		}
-		if (current_round.highestBid <= max_match) {
+	}
+	this.auto_bid = function() {
+		// console.log("Entering auto-bid");
+		var best_hand = get_highest_hand(this.cards.concat(current_round.community));
+		var round_int = current_round.community.length - 2;
+		var min_bid = 1;
+		var max_bid = 1;
+		var max_match = 1;
+		var max_raise = 0;
+		var bid_list = [1, 10, 166, 322, 1599, 1609, 2467, 3325, 6185];
+		console.log("Hand " + current_round.current_bidder + "\nRank of " + best_hand.rank);
+		for (var x = 0, y = bid_list.length; x < y; x ++) {
+			if (best_hand.rank <= bid_list[x]) {
+				// max_bid += 3;
+				// max_match += 4;
+				// if (x <= 9) {
+				// 	min_bid += 1;
+				// }
+				var z = 10 - x;
+				min_bid = Math.ceil(Math.pow(1.15, z) + (z / 3 * round_int) - 2);
+				max_bid = Math.ceil(Math.pow(1.5, z) + (z / 3 * round_int) + 1);
+				max_match = Math.ceil(Math.pow(1.1, z) + (z / 3 * round_int) + 2);
+				max_raise = Math.ceil(Math.pow(1.5, z - 3) + (z / 9 * round_int) + 1);
+				console.log("min: " + min_bid + "\nmax: " + max_bid + "\nmatch: " + max_match + "\nraise: " + max_raise);
+				break;
+			}
+		}
+		var previous_bid = this.bid;
+		if (current_round.highestBid <= max_match || current_round.highestBid - this.bid <= max_raise) {
 			// console.log("Match");
 			this.matchBid();
 		} else {
 			// console.log("Fold");
 			this.fold();
+			return;
 		}
-		if (irandom(45 / current_round.community.length - max_match) <= 0 && current_round.highestBid < max_bid) {
+		if (irandom(45 / round_int - max_match) <= 0 && current_round.highestBid < max_bid) {
 			var raise = irandom(max_bid - current_round.highestBid + 1);
 			if (raise) {
-				this.raiseBid();
+				this.raiseBid(raise);
 			}
 		}
 		if (current_round.highestBid < min_bid) {
-			this.raiseBid(current_round.highestBid - min_bid);
+			this.raiseBid(min_bid - current_round.highestBid);
 		}
-		this.check();
+		var raise = this.bid - previous_bid;
+		if (raise) {
+			var _this = this;
+			setTimeout(function() {
+				_this.check();
+			}, (raise + 1) * 500);
+		} else {
+			this.check();
+		}
 	}
 }
 
@@ -688,6 +788,16 @@ function display_winners(w) {
 	var bidRight = _this2.element();
 	bidRight.style.left = "132px";
 	document.getElementById("player").appendChild(bidRight);
+	//
+	// BEGIN USELESS SHIT I NEED TO REMOVE
+	//
+	/*setTimeout(function() {
+		_this2.onclick();
+	}, 5000);*/
+	//
+	// END USELESS SHIT
+	//
+	current_round.canBid = true;
 	update_bg_color();
 }
 

@@ -151,7 +151,7 @@ body {
 	-moz-animation: fade-in 1s ease-in;
 	-o-animation: fade-in 1s ease-in;
 }
-.bid-button:hover:not(:active) {
+.bid-button:hover:not(.show-none):not(:active) {
 	/*border-color: rgba(255, 255, 255, 0.7);*/
 	/*box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.3);*/
 	background-color: rgba(0, 0, 0, 0);
@@ -170,6 +170,15 @@ body {
 }
 .bid-button.right > .inner {
 	top: -88px;
+}
+.bid-button.show-none {
+	cursor: default;
+}
+.bid-button.show-none > .inner {
+	top: 88px;
+}
+.bid-button.right.show-none > .inner {
+	top: -176px;
 }
 .bid-button > .inner > * {
 	width: 88px;
