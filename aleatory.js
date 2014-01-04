@@ -357,6 +357,7 @@ function Round() {
 			}
 			setTimeout(function() {
 				player.showHand();
+				_this.raised = false;
 				_this.next_bidder();
 				// Create buttons
 				var pl_elem = document.getElementById("player");
