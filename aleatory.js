@@ -285,8 +285,12 @@ function Chip(from) {
 	if (/AppleWebKit/.test(navigator.userAgent) && !/Mobile/.test(navigator.userAgent)) {
 		elem.className += " webkit";
 	}
-	var r_hor = -18 + choose(-1, 1) * (48 + irandom(64));
-	var r_ver = -18 + choose(-1, 1) * (48 + irandom(64));
+	var r_len = 64 + irandom(64);
+	var r_dir = Math.PI * 2 * Math.random();
+	var r_hor = -18 + Math.cos(r_dir) * r_len;
+	var r_ver = -18 + Math.sin(r_dir) * r_len;
+	// var r_hor = -18 + choose(-1, 1) * (48 + irandom(64));
+	// var r_ver = -18 + choose(-1, 1) * (48 + irandom(64));
 	var r_rot = 6 * irandom(60);
 	switch (from) {
 		case "left": elem.style.left = (r_hor - window.innerWidth - 400) + "px"; elem.style.top = r_ver + "px"; break;
@@ -307,6 +311,51 @@ function Chip(from) {
 		elem.style.mozTransform = "rotate(" + r_rot + "deg)";
 		elem.style.oTransform = "rotate(" + r_rot + "deg)";
 	}, 100);
+}
+
+function Modal(m) {
+	if (m == null) {
+		var m = new Object();
+	}
+	var elem = document.createElement("div");
+	elem.className = "modal";
+	if (/AppleWebKit/.test(navigator.userAgent) && !/Mobile/.test(navigator.userAgent)) {
+		elem.className += " webkit";
+	}
+	elem.innerHTML = m.text;
+	var ofst_left = -96;
+	var ofst_top = -48;
+	// switch (m.from || "") {
+	// 	case "left": elem.style.left = (ofst_left - window.innerWidth - 400) + "px"; elem.style.top = (ofst_top) + "px"; break;
+	// 	case "right": elem.style.left = (ofst_left + window.innerWidth + 400) + "px"; elem.style.top = (ofst_top) + "px"; break;
+	// 	case "bottom": elem.style.left = (ofst_left) + "px"; elem.style.top = (ofst_top + window.innerHeight + 400) + "px"; break;
+	// 	default: break;
+	// }
+	switch (m.from || "") {
+		case "left": elem.style.left = (16 - ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
+		case "right": elem.style.right = (16 - ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
+		case "left": elem.style.left = (window.innerWidth / 2 - ofst_left) + "px"; elem.style.bottom = (16 - ofst_top) + "px"; break;
+		default: elem.style.left = (window.innerWidth / 2 + ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
+	}
+	// document.getElementById("pot").appendChild(elem);
+	document.body.appendChild(elem);
+	setTimeout(function() {
+		// elem.style.left = (ofst_left) + "px";
+		// elem.style.top = (ofst_top) + "px";
+		// if (Math.abs(elem.style.left - ofst_left) > 10) {
+		// 	elem.style.left = (-parseInt(elem.style.left)) + "px";
+		// } else {
+		// 	elem.style.top = (-parseInt(elem.style.top)) + "px";
+		// }
+		elem.style.opacity = "0";
+	}, 500);
+	setTimeout(function() {
+		elem.parentElement.removeChild(elem);
+		// var elem = document.getElementsByClassName("modal");
+		// if (elem.length) {
+		// 	elem[0].remove();
+		// }
+	}, 2000);
 }
 
 function Round() {
@@ -354,6 +403,7 @@ function Round() {
 				_hand.draw();
 				_hand.draw();
 				_hand.raiseBid();
+				_hand.lastBid = _hand.bid;
 			}
 			setTimeout(function() {
 				player.showHand();
@@ -426,9 +476,11 @@ function Round() {
 		// Clear hands
 		for (var x = 0, y = hands.length; x < y; x ++) {
 			hands[x].cards = new Array();
-			hands[x].bid = 0;
+			hands[x].lastBid = hands[x].bid = 0;
+			hands[x].staying = false;
 			hands[x].checking = false;
 			hands[x].folded = false;
+			hands[x].bidding = false;
 		}
 		// Clear elements
 		var pot_total = document.getElementById("pot-total");
@@ -480,7 +532,7 @@ function Round() {
 		// }
 		this.current_bidder ++;
 		if (this.current_bidder < this.hands.length) {
-			var f_count;
+			var f_count = 0;
 			for (var x = 0, y = this.hands.length; x < y; x ++) {
 				if (this.hands[x].folded) {
 					f_count ++;
@@ -534,10 +586,10 @@ function Round() {
 			} else {
 				// Remove bid buttons
 				if (this.bidLeft.parentElement != null) {
-					this.bidLeft.remove();
+					this.bidLeft.parentElement.removeChild(this.bidLeft);
 				}
 				if (this.bidRight.parentElement != null) {
-					this.bidRight.remove();
+					this.bidRight.parentElement.removeChild(this.bidRight);
 				}
 				// Find best hand and give them the pot
 				var winners = new Array();
@@ -576,7 +628,7 @@ function Hand(h) {
 	}
 	this.cards = new Array();
 	this.money = 50;
-	this.bid = 0;
+	this.lastBid = this.bid = 0;
 	this.staying = false;
 	this.folded = false;
 	this.bidding = false;
@@ -622,15 +674,34 @@ function Hand(h) {
 	}
 	this.check = function() {
 		this.checking = true;
-		current_round.next_bidder();
+		if (this != player) {
+			var raise = (this.bid - this.lastBid);
+			// console.log("Last bid: " + this.lastBid + "\nBid: " + this.bid + "\nRaise: " + raise);
+			if (raise <= 0) {
+				new Modal({
+					from: this.position,
+					text: "check"
+				});
+			}
+		}
+		this.lastBid = this.bid;
+		setTimeout(function() {
+			current_round.next_bidder();
+		}, (this == player ? 1 : 1000));
 	}
 	this.matchBid = function() {
 		var raise = current_round.highestBid - this.bid;
 		if (raise >= 1) {
 			this.raiseBid(raise);
+			this.lastBid = this.bid;
 		}
 		if (this == player) {
 			bid_buttons_set_right(false);
+		} else if (raise >= 1) {
+			new Modal({
+				from: this.position,
+				text: "match"
+			});
 		}
 	}
 	this.raiseBid = function(x) {
@@ -674,6 +745,11 @@ function Hand(h) {
 					elems[x].style.top = "400px";
 				}
 			}
+		} else {
+			new Modal({
+				from: this.position,
+				text: "fold"
+			});
 		}
 	}
 	this.auto_bid = function() {
@@ -711,21 +787,33 @@ function Hand(h) {
 			this.fold();
 			return;
 		}
+		var _this = this;
 		if (irandom(45 / round_int - max_match) <= 0 && current_round.highestBid < max_bid) {
 			var raise = irandom(max_bid - current_round.highestBid + 1);
 			if (raise) {
-				this.raiseBid(raise);
+				new Modal({
+					from: this.position,
+					text: ("raise " + raise)
+				});
+				_this.raiseBid(raise);
 			}
 		}
 		if (current_round.highestBid < min_bid) {
-			this.raiseBid(min_bid - current_round.highestBid);
+			// this.raiseBid(min_bid - current_round.highestBid);
+			var raise2 = min_bid - current_round.highestBid;
+			if (raise2) {
+				new Modal({
+					from: this.position,
+					text: "raise " + (raise2)
+				});
+				this.raiseBid(raise2);
+			}
 		}
-		var raise = this.bid - previous_bid;
-		if (raise) {
-			var _this = this;
+		var raise3 = this.bid - previous_bid;
+		if (raise3) {
 			setTimeout(function() {
 				_this.check();
-			}, (raise + 1) * 500);
+			}, (raise3 + 2) * 500);
 		} else {
 			this.check();
 		}
@@ -784,7 +872,7 @@ function display_winners(w) {
 		var winner = hands[w[0].id];
 		winner.money += current_round.pot;
 		current_round.clear(winner.position);
-		_this2.element().remove();
+		_this2.element().parentElement.removeChild(_this2.element());
 	}
 	var bidRight = _this2.element();
 	bidRight.style.left = "132px";
