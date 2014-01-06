@@ -36,10 +36,19 @@ window.addEventListener("load", function() {
 		name: "Right",
 		position: "right"
 	}));
-	current_round = new Round();
-	setTimeout(function() {
-		current_round.start();
-	}, 500);
+	// current_round = new Round();
+	// setTimeout(function() {
+	// 	current_round.start();
+	// }, 500);
+	document.body.style.cursor = "pointer";
+	document.body.addEventListener("click", function() {
+		if (document.getElementById("menu-wrapper").style.opacity != "0") {
+			document.body.style.cursor = "";
+			document.getElementById("menu-wrapper").style.opacity = "0";
+			current_round = new Round();
+			current_round.start();
+		}
+	});
 }, false);
 
 function choose() {
@@ -54,9 +63,32 @@ function update_bg_color() {
 	bg_color_hue = bg_color_hue % 360;
 	document.body.style.backgroundColor = "hsl(" + bg_color_hue + ", 80%, 30%)";
 	var elems = document.getElementsByClassName("bid-button");
+	document.getElementById("menu").style.color = "hsl(" + bg_color_hue + ", 100%, 50%)";
 	document.getElementById("pot-total").style.color = "hsl(" + bg_color_hue + ", 90%, 50%)";
 	for (var x = 0, y = elems.length; x < y; x ++) {
 		elems[x].style.color = "hsl(" + bg_color_hue + ", 90%, 50%)";
+	}
+}
+
+function update_rankings() {
+	var rankings_elem = document.getElementById("rankings");
+	while (rankings_elem.children.length) {
+		rankings_elem.removeChild(rankings_elem.children[0]);
+	}
+	var rankings = hands.concat([]).sort(function(a, b) {
+		if (a.money == b.money) {
+			if (a == player) {
+				return -1;
+			} else if (b == player) {
+				return 1;
+			}
+		}
+		return b.money - a.money;
+	});
+	for (var x = 0, y = rankings.length; x < y; x ++) {
+		var elem = document.createElement("div");
+		elem.innerHTML = (x + 1) + "<strong>" + (rankings[x].name) + "</strong><i>$" + (rankings[x].money) + "</i><span>" + (rankings[x].bid ? "$" + rankings[x].bid : "") + "</span>";
+		rankings_elem.appendChild(elem);
 	}
 }
 
@@ -389,6 +421,7 @@ function Round() {
 	}
 	
 	this.start = function() {
+		update_rankings();
 		this.deck.shuffle(10);
 		for (var i = 0; i < 3; i ++) {
 			this.deal();
@@ -732,6 +765,7 @@ function Hand(h) {
 			current_round.raised = true;
 		}
 		update_bg_color();
+		update_rankings();
 	}
 	this.fold = function() {
 		this.folded = true;
