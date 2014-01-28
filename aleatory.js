@@ -734,7 +734,9 @@ function Hand(h) {
 			// ALL IN!
 			current_round.bidCapped = true;
 			// Uh... Do something...
-			this.check();
+			if (this == player) {
+				this.check();
+			}
 		}
 	}
 	this.fold = function() {
