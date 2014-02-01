@@ -150,6 +150,9 @@ body {
 	display: inline-block;
 	padding-left: 12px;
 }
+#text-results > div > span {
+	opacity: 0.4;
+}
 
 #rankings {
 	position: absolute;

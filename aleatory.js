@@ -835,7 +835,12 @@ function display_winners(w) {
 	}
 	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 144, x = -x) {
 		var text = document.createElement("div");
-		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i>";
+		var hand_str = "";
+		for (var c = w[i].hand.length - 1; c >= 0; c --) {
+			var r_str = w[i].hand[c].rankStr;
+			hand_str = (r_str != "10" ? r_str[0].toUpperCase() + hand_str : "T" + hand_str);
+		}
+		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i><span>" + hand_str + "</span>";
 		text.style.top = (y) + "px";
 		document.getElementById("text-results").appendChild(text);
 		var hand = hands[w[i].id];
@@ -1118,7 +1123,7 @@ function get_highest_hand(cards) {
 				if (x < rank_x) {
 					rank += 1;
 				}
-				title += " (" + (rank_list[x][0].toUpperCase() + rank_list[x].substr(1)) + " Kick)";
+				// title += " (" + (rank_list[x][0].toUpperCase() + rank_list[x].substr(1)) + " Kick)";
 				rank += x;
 				break;
 			}
