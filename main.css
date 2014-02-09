@@ -172,6 +172,7 @@ body {
 	display: inline-block;
 	width: 33%;
 	text-align: center;
+	background: linear-gradient(to right, transparent 20%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.5) 60%, transparent 80%);
 	animation: fade-in 0.2s;
 	-webkit-animation: fade-in 0.2s;
 	-moz-animation: fade-in 0.2s;
