@@ -519,3 +519,14 @@ body {
 	outline: none;
 	box-shadow: inset 0px 2px 4px 0px black;
 }
+
+#mic-toggle {
+	position: fixed;
+	right: 0px;
+	bottom: 0px;
+	display: block;
+	width: 28px;
+	height: 28px;
+	/*background-color: white;*/
+	z-index: 100;
+}
