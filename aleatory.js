@@ -297,15 +297,16 @@ function Card(c) {
 			front.appendChild(rank);
 			var suit = document.createElement("div");
 			suit.className = "suit";
-			if (!IS_BASIC) {
-				if (this.suit % 3 != 0) {
-					suit.className += " red";
-				}
-				suit.innerHTML = "<font face=\"SYMBOL\">&#" + (167 + this.suit) + ";</font>";
-			} else {
-				front.className += " suit-words";
-				suit.innerHTML = this.suitStr.toUpperCase();
-			}
+			suit.className += " " + this.suitStr;
+			// if (!IS_BASIC) {
+			// 	if (this.suit % 3 != 0) {
+			// 		suit.className += " red";
+			// 	}
+			// 	suit.innerHTML = "<font face=\"SYMBOL\">&#" + (167 + this.suit) + ";</font>";
+			// } else {
+			// 	front.className += " suit-words";
+			// 	suit.innerHTML = this.suitStr.toUpperCase();
+			// }
 			front.appendChild(suit);
 			elem.appendChild(front);
 			var back = document.createElement("div");
