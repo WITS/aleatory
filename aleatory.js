@@ -1,8 +1,27 @@
 // Constants
-IS_MOBILE = IS_MOBILE = /(iPhone|iPod|iPad|Android|BlackBerry)/i.test(navigator.userAgent);
-IS_BASIC = !(/AppleWebKit/.test(navigator.userAgent) && (/Android/.test(navigator.userAgent) || !/Mobile/.test(navigator.userAgent)));
+var userAgent = navigator.userAgent;
+IS_MOBILE = /(iPhone|iPod|iPad|Android|BlackBerry)/i.test(userAgent);
+IS_BASIC = !(/AppleWebKit/.test(userAgent) && (/Android/.test(userAgent) || !/Mobile/.test(userAgent)));
+IS_FIREFOX = (/\bfirefox\//i.test(userAgent) && !/\bseamonkey\//i.test(userAgent));
+IS_CHROME = (/\bchrome\//i.test(userAgent) && !/\bchromium\//i.test(userAgent));
+IS_SAFARI = (/\bsafari\//i.test(userAgent) && !/\b(?:chrome|chromium)\//i.test(userAgent));
+IS_OPERA = (/\b(?:opera|opr)\//i.test(userAgent));
+IS_WEBKIT = (IS_CHROME || IS_SAFARI || IS_OPERA);
+IS_MSIE = (/\bMSIE\b/i.test(userAgent));
+// IS_EDGE?
 
 window.addEventListener("load", function() {
+	// UserAgent body classes
+	var classes = new Array();
+	if (IS_MOBILE) classes.push("mobile");
+	if (IS_FIREFOX) classes.push("firefox");
+	if (IS_CHROME) classes.push("chrome");
+	if (IS_SAFARI) classes.push("safari");
+	if (IS_OPERA) classes.push("opera");
+	if (IS_WEBKIT) classes.push("webkit");
+	if (IS_MSIE) classes.push("msie");
+	document.body.className = classes.join(' ');
+	// Initalize bg color
 	bg_color_hue = irandom(360);
 	update_bg_color();
 	// Set up placeholders
