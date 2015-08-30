@@ -62,7 +62,7 @@ body.mobile #menu {
 
 body.mobile #menu .subtitle {
 	font-size: 2.4em;
-	line-height: 1.5em;
+	line-height: 1.25em;
 }
 
 #menu .tagline {
@@ -84,14 +84,21 @@ body.mobile #menu .tagline::before {
 
 #community {
 	position: fixed;
-	top: 72px;
-	left: 50%;
+	top: 2.4em;
+	left: 0;
+	width: 100%;
+	overflow: visible;
+	text-align: center;
 }
 
 #player {
 	position: fixed;
-	bottom: 100px;
-	left: 50%;
+	bottom: 5.2em; /* fallback */
+	bottom: calc(2.4em + 28px);
+	left: 0;
+	width: 100%;
+	overflow: visible;
+	text-align: center;
 }
 
 #pot {
@@ -193,6 +200,7 @@ body.mobile #menu .tagline::before {
 	z-index: 40;
 	cursor: default;
 }
+
 #rankings > div {
 	display: inline-block;
 	width: 33%;
@@ -223,32 +231,39 @@ body.mobile #menu .tagline::before {
 .placeholder {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	display: block;
-	position: absolute;
+	position: relative;
+	display: inline-block;
+	/*position: absolute;*/
 	width: 1em;
 	height: 1em;
 	font-size: 9.6em;
 	font-family: Arial;
-	border-radius: 8px;
+	border-radius: 0.0833em;
 	/*border: 1px solid rgba(0, 0, 0, 0.5);*/
 	background-color: rgba(0, 0, 0, 0.2);
+	overflow: visible;
 	box-shadow: 0px 0px 4px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
 	animation: fade-in 1s;
 	-webkit-animation: fade-in 1s;
 	-moz-animation: fade-in 1s;
 	-o-animation: fade-in 1s;
 }
+
+.placeholder:not(:first-child) {
+	margin-left: 0.25em;
+}
+
 .bid-button {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	display: block;
-	position: absolute;
+	display: inline-block;
+	/*position: absolute;*/
 	overflow: hidden;
 	width: 1em;
 	height: 1em;
 	font-size: 9.6em;
 	font-family: Arial;
-	border-radius: 8px;
+	border-radius: 0.0833em;
 	padding: 4px;
 	background-color: rgba(0, 0, 0, 0.2);
 	box-shadow: 0px 0px 4px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
@@ -262,6 +277,11 @@ body.mobile #menu .tagline::before {
 	-moz-animation: fade-in 1s ease-in;
 	-o-animation: fade-in 1s ease-in;
 }
+
+.bid-button:not(:first-child) {
+	margin-left: 0.25em;
+}
+
 .bid-button:hover:not(.show-none):not(:active) {
 	/*border-color: rgba(255, 255, 255, 0.7);*/
 	/*box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.3);*/
@@ -342,6 +362,11 @@ body.mobile #menu .tagline::before {
 	-moz-transition: left 1s, top 1s, bottom 1s, right 1s;
 	-o-transition: left 1s, top 1s, bottom 1s, right 1s;
 }
+
+.placeholder .card {
+	font-size: 1em;
+}
+
 .card .front, .card .back {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -350,7 +375,7 @@ body.mobile #menu .tagline::before {
 	top: 0px;
 	width: 1em;
 	height: 1em;
-	border-radius: 8px;
+	border-radius: 0.0833em;
 	background-color: white;
 }
 .card:not(.flipped) > * {
@@ -377,14 +402,15 @@ body.mobile #menu .tagline::before {
 	line-height: 0.7777em;
 	height: 0.7777em;
 }
-.card .front .suit {
+/*.card .front .suit {
 	font-size: 0.25em;
 	line-height: 1em;
-	/*padding-bottom: 4px;*/
-}
+}*/
 .card .front .suit {
 	width: 14.5px;
 	height: 20px;
+	font-size: 0.25em;
+	line-height: 1em;
 	margin: 0 auto;
 	background-image: url(suits.svg);
 	background-size: 32.5px 42px;
@@ -422,7 +448,7 @@ body.webkit .card .front .suit {
 	-moz-transition: opacity 0s linear 0.25s;
 	-o-transition: opacity 0s linear 0.25s;
 	background-color: black;
-	border: 28px solid white;
+	border: 0.25em solid white;
 }
 @keyframes card-front-flip {
 	from { transform: perspective(500px) rotateY(180deg); }
@@ -529,11 +555,11 @@ body.webkit .card .front .suit {
 .modal {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	width: 192px;
-	height: 96px;
+	width: 3.6923em;
+	height: 1.8461em;
 	position: absolute;
-	padding: 16px;
-	border-radius: 8px;
+	padding: 0.3076em;
+	border-radius: 0.1538em;
 	background-color: white;
 	font-family: Arial;
 	font-size: 5.2em;
@@ -583,8 +609,40 @@ body.webkit .card .front .suit {
 
 @media (max-width: 600px) {
 
-	body {
-		font-size: 8px;
+	.card .front .suit {
+		width: 0.6041em;
+		height: 0.8333em;
+		background-size: 1.3541em 1.75em;
+		background-position: -0.0625em 0;
+	}
+	body.webkit .card .front .suit {
+		width: 0.625em;
+	}
+	.card .front .suit.spades {
+		background-position: -0.6666em -0.7916em;
+	}
+	.card .front .suit.hearts {
+		background-position: -0.0625em -0.7916em;
+	}
+	.card .front .suit.diamonds {
+		background-position: -0.6666em 0;
 	}
 
+	#rankings > div {
+		background: none;
+		line-height: 28px;
+	}
+}
+
+@media (max-width: 400px) {
+
+	#menu-wrapper > #menu .subtitle {
+		font-size: 3.2em;
+		line-height: 1.25em;
+	}
+
+	#menu-wrapper > #menu .tagline {
+		font-size: 2.8em;
+		padding-bottom: 12px;
+	}
 }

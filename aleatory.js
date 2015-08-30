@@ -26,17 +26,15 @@ window.addEventListener("load", function() {
 	update_bg_color();
 	// Set up placeholders
 	var co_elem = document.getElementById("community");
-	for (var i = 0, left = -288; i < 5; i ++, left += 120) {
+	for (var i = 0; i < 5; i ++) {
 		// Community
 		var elem = new Placeholder().element();
-		elem.style.left = (left) + "px";
 		co_elem.appendChild(elem);
 	}
 	var pl_elem = document.getElementById("player");
-	for (var i = 0, left = -108; i < 2; i ++, left += 120) {
+	for (var i = 0; i < 2; i ++) {
 		// Player
 		var elem = new Placeholder().element();
-		elem.style.left = (left) + "px";
 		pl_elem.appendChild(elem);
 	}
 	// Hand objects
@@ -113,7 +111,19 @@ window.addEventListener("load", function() {
 		});
 	}
 
+	handle_resize();
+
 }, false);
+
+function handle_resize() {
+	if (window.innerWidth < 600) {
+		document.body.style.fontSize = (window.innerWidth / 60.0) + "px";
+	} else {
+		document.body.style.fontSize = "";
+	}
+}
+
+window.addEventListener("resize", handle_resize);
 
 function choose() {
 	return arguments[irandom(arguments.length)];
@@ -192,8 +202,8 @@ function Placeholder() {
 		if (this.elementObj == null) {
 			var elem = document.createElement("div");
 			elem.className = "placeholder";
-			elem.style.left = "-48px";
-			elem.style.top = "-48px";
+			// elem.style.left = "-48px";
+			// elem.style.top = "-48px";
 			this.elementObj = elem;
 		}
 		return this.elementObj;
@@ -306,7 +316,7 @@ function Card(c) {
 			// generate that shit
 			var elem = document.createElement("div");
 			elem.className = "card";
-			elem.style.left = "-48px";
+			// elem.style.left = "-48px";
 			elem.style.top = "-48px";
 			var front = document.createElement("div");
 			front.className = "front";
@@ -481,17 +491,28 @@ function Round() {
 		this.community.push(card);
 		var co_elem = document.getElementById("community");
 		var cd_elem = card.element();
-		co_elem.appendChild(cd_elem);
-		if (c_id > 0) {
-			if (c_id % 2 == 1) {
-				cd_elem.style.left = (-168 - (c_id == 3 ? 120 : 0)) + "px";
-			} else {
-				cd_elem.style.left = (72 + (c_id == 4 ? 120 : 0)) + "px";
-			}
+		// co_elem.appendChild(cd_elem);
+		var n;
+		switch (c_id) {
+			case 0: n = 3; break;
+			case 1: n = 2; break;
+			case 2: n = 4; break;
+			case 3: n = 1; break;
+			case 4: n = 5; break;
+			default: n = 0; break;
 		}
-		cd_elem.style.top = (-188 - 48 * c_id) + "px";
+		var placeholder = document.querySelector("#community > :nth-child(" + n + ")");
+		placeholder.appendChild(cd_elem);
+		// if (c_id > 0) {
+		// 	if (c_id % 2 == 1) {
+		// 		cd_elem.style.left = (-168 - (c_id == 3 ? 120 : 0)) + "px";
+		// 	} else {
+		// 		cd_elem.style.left = (72 + (c_id == 4 ? 120 : 0)) + "px";
+		// 	}
+		// }
+		cd_elem.style.top = (-140 - 48 * c_id) + "px";
 		setTimeout(function() {
-			cd_elem.style.top = "-48px";
+			cd_elem.style.top = "0px";
 		}, 1);
 		setTimeout(function() {
 			card.flip();
@@ -535,8 +556,9 @@ function Round() {
 					}
 				}
 				_this.bidLeft = _this1.element();
-				_this.bidLeft.style.left = "-228px";
-				pl_elem.appendChild(_this.bidLeft);
+				// _this.bidLeft.style.left = "-228px";
+				// pl_elem.appendChild(_this.bidLeft);
+				pl_elem.insertBefore(_this.bidLeft, pl_elem.firstChild);
 				var _this2 = new BidButton({
 					left_text: "raise",
 					right_text: "match"
@@ -549,7 +571,7 @@ function Round() {
 					}
 				}
 				_this.bidRight = _this2.element();
-				_this.bidRight.style.left = "132px";
+				// _this.bidRight.style.left = "132px";
 				pl_elem.appendChild(_this.bidRight);
 				bid_buttons_set_active(false);
 				update_bg_color();
@@ -760,19 +782,22 @@ function Hand(h) {
 		var c_id = this.cards.length;
 		this.cards.push(card);
 		var cd_elem = card.element();
-		if (this.element != null) {
-			this.element.appendChild(cd_elem);
+		var placeholder;
+		if (this.elementId) {
+			placeholder = document.querySelector("#" + this.elementId + " > .placeholder:empty");
+			if (placeholder != null) {
+				placeholder.appendChild(cd_elem);
+			}
 		}
+		// if (this.element != null) {
+		// 	this.element.appendChild(cd_elem);
+		// }
 		if (this.position == "bottom") {
 			cd_elem.style.top = "";
-			if (c_id) {
-				cd_elem.style.left = "12px";
-			} else {
-				cd_elem.style.left = "-108px";
-			}
-			cd_elem.style.bottom = (-188 - 48 * c_id) + "px";
+			cd_elem.style.bottom = (-140 - 48 * c_id) + "px";
+			console.log(cd_elem.style.bottom);
 			setTimeout(function() {
-				cd_elem.style.bottom = "-48px";
+				cd_elem.style.bottom = "0px";
 			}, 1);
 		}
 		
