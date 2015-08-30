@@ -42,35 +42,60 @@ body {
 	background: linear-gradient(to right, transparent 10%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.3) 70%, transparent 90%);
 	cursor: default;
 }
+
+body.mobile #menu {
+	height: auto;
+	background: rgba(0, 0, 0, 0.3);
+}
+
 #menu .title {
 	font-size: 7.2em;
 	line-height: 68px;
 	padding-bottom: 12px;
 }
+
 #menu .subtitle {
 	font-size: 3.2em;
 	line-height: 28px;
 	padding-bottom: 12px;
 }
+
+body.mobile #menu .subtitle {
+	font-size: 2.4em;
+	line-height: 1.5em;
+}
+
 #menu .tagline {
 	font-size: 2.0em;
 	line-height: 18px;
 }
 
+body.mobile #menu .tagline {
+	padding-bottom: 8px;
+}
+
+#menu .tagline::before {
+	content: "click";
+}
+
+body.mobile #menu .tagline::before {
+	content: "tap";
+}
+
 #community {
-	position: absolute;
+	position: fixed;
 	top: 72px;
 	left: 50%;
 }
 
 #player {
-	position: absolute;
+	position: fixed;
 	bottom: 100px;
 	left: 50%;
 }
 
 #pot {
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 }
@@ -200,8 +225,9 @@ body {
 	-moz-box-sizing: border-box;
 	display: block;
 	position: absolute;
-	width: 96px;
-	height: 96px;
+	width: 1em;
+	height: 1em;
+	font-size: 9.6em;
 	font-family: Arial;
 	border-radius: 8px;
 	/*border: 1px solid rgba(0, 0, 0, 0.5);*/
@@ -216,10 +242,11 @@ body {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	display: block;
-	position: absolute;	
+	position: absolute;
 	overflow: hidden;
-	width: 96px;
-	height: 96px;
+	width: 1em;
+	height: 1em;
+	font-size: 9.6em;
 	font-family: Arial;
 	border-radius: 8px;
 	padding: 4px;
@@ -242,8 +269,8 @@ body {
 	box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.2), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.5);
 }
 .bid-button > .inner {
-	width: 88px;
-	height: 88px;
+	width: calc(1em - 8px);
+	height: calc(1em - 8px);
 	position: relative;
 	left: 0px;
 	top: 0px;
@@ -253,20 +280,20 @@ body {
 	-o-transition: top 0.5s;
 }
 .bid-button.right > .inner {
-	top: -88px;
+	top: calc(-1em + 8px);
 }
 .bid-button.show-none {
 	cursor: default;
 }
 .bid-button.show-none > .inner {
-	top: 88px;
+	top: calc(1em - 8px);
 }
 .bid-button.right.show-none > .inner {
 	top: -176px;
 }
 .bid-button > .inner > * {
-	width: 88px;
-	height: 88px;
+	width: calc(1em - 8px);
+	height: calc(1em - 8px);
 }
 .bid-button > .inner > * > * {
 	text-align: center;
@@ -275,13 +302,13 @@ body {
 	/*color: white;*/
 }
 .bid-button .letter {
-	line-height: 56px;
-	font-size: 5.6em;
+	line-height: 1em;
+	font-size: 0.5833em;
 	text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
 }
 .bid-button .text {
-	line-height: 32px;
-	font-size: 2.4em;
+	line-height: calc(1em + 8px);
+	font-size: 0.25em;
 	text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
 }
 @keyframes fade-in {
@@ -306,8 +333,9 @@ body {
 	position: absolute;
 	/*left: -48px;
 	top: -48px;*/
-	width: 96px;
-	height: 96px;
+	width: 1em;
+	height: 1em;
+	font-size: 9.6em;
 	font-family: Arial;
 	transition: left 1s, top 1s, bottom 1s, right 1s;
 	-webkit-transition: left 1s, top 1s, bottom 1s, right 1s;
@@ -320,8 +348,8 @@ body {
 	position: absolute;
 	left: 0px;
 	top: 0px;
-	width: 96px;
-	height: 96px;
+	width: 1em;
+	height: 1em;
 	border-radius: 8px;
 	background-color: white;
 }
@@ -344,19 +372,20 @@ body {
 	vertical-align: middle;
 }
 .card .front .rank {
-	padding-top: 12px;
-	font-size: 7.2em;
-	line-height: 56px;
+	padding-top: 0.1666em;
+	font-size: 0.75em;
+	line-height: 0.7777em;
+	height: 0.7777em;
 }
 .card .front .suit {
-	font-size: 2.4em;
-	line-height: 24px;
+	font-size: 0.25em;
+	line-height: 1em;
 	/*padding-bottom: 4px;*/
 }
 .card .front .suit {
-	display: inline-block;
 	width: 14.5px;
 	height: 20px;
+	margin: 0 auto;
 	background-image: url(suits.svg);
 	background-size: 32.5px 42px;
 	background-repeat: no-repeat;
@@ -550,4 +579,12 @@ body.webkit .card .front .suit {
 	height: 28px;
 	/*background-color: white;*/
 	z-index: 100;
+}
+
+@media (max-width: 600px) {
+
+	body {
+		font-size: 8px;
+	}
+
 }
