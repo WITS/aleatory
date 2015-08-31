@@ -181,6 +181,7 @@ body.mobile #menu .tagline::before {
 	-moz-animation: fade-in 1s;
 	-o-animation: fade-in 1s;
 }
+
 #results > div.text > * {
 	display: inline-block;
 	padding-left: 0.6em;
@@ -535,8 +536,8 @@ body.webkit .card .front .suit {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	position: absolute;
-	width: 48px;
-	height: 48px;
+	width: 4.8em;
+	height: 4.8em;
 	border-radius: 50%;
 	/*background-color: rgba(255, 255, 255, 0.1);*/
 	background-color: white;
@@ -546,12 +547,12 @@ body.webkit .card .front .suit {
 	-moz-transition: left 1s, top 1s, bottom 1s, right 1s, -moz-transform 1s ease-out;
 	-o-transition: left 1s, top 1s, bottom 1s, right 1s, -o-transform 1s ease-out;
 }
-.chip.webkit {
-	border: 4px dashed black;
+body.webkit .chip {
+	border: 0.4em dashed black;
 	box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.5);
-	padding: 2px;
+	padding: 0.2em;
 }
-.chip.webkit::after {
+body.webkit .chip::after {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	display: block;
@@ -559,16 +560,16 @@ body.webkit .card .front .suit {
 	width: 100%;
 	height: 100%;
 	border-radius: 50%;
-	border: 1px dashed black;
+	border: 0.1em dashed black;
 }
-.chip:not(.webkit) {
+body:not(.webkit) .chip {
 	/*border: 2px solid black;*/
 	box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.5);
 	/*, inset 2px 2px 3px 0px rgba(0, 0, 0, 0.4);*/
-	padding: 4px;
+	padding: 0.4em;
 	background-color: white;
 }
-.chip:not(.webkit)::after {
+body:not(.webkit) .chip::after {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	display: block;
@@ -576,7 +577,7 @@ body.webkit .card .front .suit {
 	width: 100%;
 	height: 100%;
 	border-radius: 50%;
-	border: 2px inset rgba(0, 0, 0, 0.5);
+	border: 0.2em inset rgba(0, 0, 0, 0.5);
 	background-color: whitesmoke;
 }
 
@@ -663,6 +664,10 @@ body.webkit .card .front .suit {
 	}
 	.card .front .suit.diamonds {
 		background-position: -0.6666em 0;
+	}
+
+	#results > div.text {
+		background: black;
 	}
 }
 
