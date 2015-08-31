@@ -116,10 +116,21 @@ window.addEventListener("load", function() {
 }, false);
 
 function handle_resize() {
+	var em;
 	if (window.innerWidth < 600) {
-		document.body.style.fontSize = (window.innerWidth / 60.0) + "px";
+		em = (window.innerWidth / 60.0);
+		document.body.style.fontSize = em + "px";
 	} else {
+		em = 10;
 		document.body.style.fontSize = "";
+	}
+	var results = document.getElementById("results");
+	if (window.innerHeight < 268 + 48 * em) {
+		results.style.fontSize = ((window.innerHeight - 268) / 48.0) + "px";
+		results.style.top = (9.6 * em + 48) + "px";
+	} else {
+		results.style.fontSize = "";
+		results.style.top = "";
 	}
 }
 
@@ -580,23 +591,21 @@ function Round() {
 	}
 	this.clear = function(pot_dir) {
 		var pot_dir = pot_dir || "bottom";
-		var elems = document.getElementById("community").children;
-		for (var x = 0, y = elems.length; x < y; x ++) {
-			if (elems[x].className != "placeholder") {
-				elems[x].style.left = "0px";
-				elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
-			}
-		}
-		var elems = document.getElementById("card-results").children;
+		var elems = document.querySelectorAll("#community .card");
 		for (var x = 0, y = elems.length; x < y; x ++) {
 			elems[x].style.left = "0px";
 			elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
 		}
-		var elems = document.getElementById("text-results").children;
+		var elems = document.getElementById("results").children;
 		for (var x = 0, y = elems.length; x < y; x ++) {
 			elems[x].style.left = "0px";
 			elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
 		}
+		// var elems = document.getElementById("text-results").children;
+		// for (var x = 0, y = elems.length; x < y; x ++) {
+		// 	elems[x].style.left = "0px";
+		// 	elems[x].style.top = (-window.innerHeight - irandom(300)) + "px";
+		// }
 		var elems = document.getElementById("pot").children;
 		for (var x = 0, y = elems.length; x < y; x ++) {
 			if (pot_dir == "bottom") {
@@ -623,25 +632,21 @@ function Round() {
 		var pot_total = document.getElementById("pot-total");
 		pot_total.removeChild(pot_total.children[0]);
 		setTimeout(function() {
-			var community = document.getElementById("community");
-			var elems = community.children;
-			for (var x = 0, y = elems.length; x < y; x ++) {
-				if (elems[x].className != "placeholder") {
-					community.removeChild(elems[x]);
-					x --;
-					y --;
-				}
+			// var community = document.getElementById("community");
+			var elems = document.querySelectorAll("#community .card, #results > *");
+			for (var y = elems.length; y --; ) {
+				elems[y].parentElement.removeChild(elems[y]);
 			}
-			var text_results = document.getElementById("text-results");
-			var elems = text_results.children;
-			while (elems.length) {
-				text_results.removeChild(elems[0]);
-			}
-			var card_results = document.getElementById("card-results");
-			var elems = card_results.children;
-			while (elems.length) {
-				card_results.removeChild(elems[0]);
-			}
+			// var text_results = document.getElementById("text-results");
+			// var elems = text_results.children;
+			// while (elems.length) {
+			// 	text_results.removeChild(elems[0]);
+			// }
+			// var card_results = document.getElementById("card-results");
+			// var elems = card_results.children;
+			// while (elems.length) {
+			// 	card_results.removeChild(elems[0]);
+			// }
 			var pot = document.getElementById("pot");
 			var elems = pot.children;
 			while (elems.length) {
@@ -952,53 +957,70 @@ function Hand(h) {
 }
 
 function hide_player_cards() {
-	var cards = player.cards;
-	for (var i = 0; i < cards.length; i ++) {
-		if (cards[i].element().parentElement.id != "player") {
-			continue;
-		}
-		cards[i].element().style.top = (window.innerHeight + 120) + "px";
+	var elements = document.querySelectorAll("#player .card");
+	for (var i = 0; i < elements.length; i ++) {
+		elements[i].style.bottom = "-196px";
 	}
 }
 
 function display_winners(w) {
-	if (document.getElementById("text-results").children.length > 0) {
+	if (document.getElementById("results").children.length > 0) {
 		return;
 	}
+	document.body.className += " round-end";
+	var results = document.getElementById("results");
+	var x_offset = window.innerWidth * 0.5;
 	for (i = 0, y = -208, x = -window.innerWidth; i < w.length; i ++, y += 144, x = -x) {
 		var text = document.createElement("div");
+		text.className = "text";
+		var hand = w[i].hand;
 		var hand_str = "";
-		for (var c = w[i].hand.length - 1; c >= 0; c --) {
-			var r_str = w[i].hand[c].rankStr;
-			hand_str = (r_str != "10" ? r_str[0].toUpperCase() + hand_str : "T" + hand_str);
+		for (var c = hand.length; c --; ) {
+			var r_str = hand[c].rankStr;
+			hand_str = (r_str != "10" ? r_str[0].toUpperCase() : "T") + hand_str;
 		}
 		text.innerHTML = (!hands[w[i].id].folded ? i + 1 : "Fold") + "<strong>" + w[i].name + "</strong><i>" + w[i].title + "</i><span>" + hand_str + "</span>";
-		text.style.top = (y) + "px";
-		document.getElementById("text-results").appendChild(text);
+		// text.style.top = (y) + "px";
+		// document.getElementById("text-results").appendChild(text);
+		results.appendChild(text);
 		var hand = hands[w[i].id];
+
+		var hand_elem = document.createElement("div");
+		hand_elem.className = "hand";
+
 		var card1 = hand.cards[0].element();
 		if (card1.parentElement != null) {
 			card1.parentElement.removeChild(card1);
+			card1.style.bottom = "";
 		}
-		card1.style.left = (x - 108) + "px";
-		card1.style.top = (y + 40) + "px";
-		document.getElementById("card-results").appendChild(card1);
+		// card1.style.left = (x - 108) + "px";
+		card1.style.left = (-108 - x_offset) + "px";
+		// card1.style.top = (y + 40) + "px";
+		card1.style.top = "";
+		// document.getElementById("card-results").appendChild(card1);
+		hand_elem.appendChild(card1);
 		var card2 = hand.cards[1].element();
 		if (card2.parentElement != null) {
 			card2.parentElement.removeChild(card2);
+			card2.style.bottom = "";
 		}
-		card2.style.left = (x + 12) + "px";
-		card2.style.top = (y + 40) + "px";
-		document.getElementById("card-results").appendChild(card2);
+		// card2.style.left = (x + 12) + "px";
+		card2.style.left = (12 - x_offset) + "px";
+		// card2.style.top = (y + 40) + "px";
+		card2.style.top = "";
+		// document.getElementById("card-results").appendChild(card2);
+		hand_elem.appendChild(card2);
+		results.appendChild(hand_elem);
 	}
 	setTimeout(function() {
-		var elems = document.getElementById("card-results").children;
+		var elems = document.querySelectorAll("#results .card");
 		for (var x = 0, y = elems.length; x < y; x ++) {
-			elems[x].style.left = (x % 2 == 1 ? "-108px" : "12px");
+			// elems[x].style.left = (x % 2 == 1 ? "-108px" : "12px");
+			elems[x].style.left = "0px";
 		}
 	}, 1);
 	setTimeout(function() {
-		var elems = document.getElementById("card-results").children;
+		var elems = document.querySelectorAll("#results .card");
 		for (var x = 0, y = elems.length; x < y; x ++) {
 			elems[x].classList.add("flipped");
 		}
@@ -1008,6 +1030,8 @@ function display_winners(w) {
 		right_text: "next"
 	});
 	current_round.next = function() {
+		var className = document.body.className;
+		document.body.className = className.substr(0, className.length - 10);
 		var winner = hands[w[0].id];
 		winner.money += current_round.pot;
 		current_round.clear(winner.position);
