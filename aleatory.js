@@ -800,7 +800,7 @@ function Hand(h) {
 		if (this.position == "bottom") {
 			cd_elem.style.top = "";
 			cd_elem.style.bottom = (-140 - 48 * c_id) + "px";
-			console.log(cd_elem.style.bottom);
+			// console.log(cd_elem.style.bottom);
 			setTimeout(function() {
 				cd_elem.style.bottom = "0px";
 			}, 1);
@@ -899,6 +899,9 @@ function Hand(h) {
 		if (this == player) {
 			return;
 		}
+		var possible = new TheoreticalHands();
+		possible.calculate(this.cards.concat(current_round.community));
+		console.log(possible);
 		var best_hand = get_highest_hand(this.cards.concat(current_round.community));
 		var round_int = current_round.community.length - 2;
 		var min_bid = 1;
