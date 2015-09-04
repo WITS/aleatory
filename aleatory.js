@@ -143,6 +143,10 @@ function irandom(x) {
 	return Math.floor(Math.random() * x);
 }
 
+function irandom_range(x1, x2) {
+	return x1 + irandom(x2 - x1);
+}
+
 function handle_speech_command() {
 	if (current_round.showingResults) {
 		if (/next|done|continue/i.test(SpeechInfo.lastCommand.transcript)) {
@@ -537,6 +541,25 @@ function Round() {
 		for (var i = 0; i < 3; i ++) {
 			this.deal();
 		}
+
+		// Brain development
+		for (var i = hands.length; i --; ) {
+			if (hands[i] == player) continue;
+			// This is just early testing
+			// Evaluate performance
+			var health = hands[i].money - hands[i].lastMoney;
+			console.log("Hand " + i + " health was " + health);
+			if (health < -2) {
+				hands[i].brain.remove(hands[i].brain.newCount);
+			}
+			hands[i].brain.newCount = 0;
+			// Add new neurons
+			for (var n = irandom_range(1, 3); n --; ) {
+				hands[i].brain.push(generateRule());
+				++ hands[i].brain.newCount;
+			}
+		}
+
 		var _this = this;
 		setTimeout(function() {
 			var span = document.createElement("span");
@@ -764,7 +787,8 @@ function Hand(h) {
 		var h = new Object();
 	}
 	this.cards = new Array();
-	this.money = 50;
+	this.lastMoney = this.money = 50;
+	this.brain = new NeuralNetwork();
 	this.lastBid = this.bid = 0;
 	this.staying = false;
 	this.folded = false;
@@ -899,33 +923,36 @@ function Hand(h) {
 		if (this == player) {
 			return;
 		}
-		var my_possible = new TheoreticalHands();
-		my_possible.calculate(this.cards.concat(current_round.community));
-		console.log("my_possible:");
-		console.log(my_possible);
-		var all_possible = new TheoreticalHands();
-		all_possible.calculate(current_round.community.concat([]));
-		console.log("all_possible:");
-		console.log(all_possible);
-		var best_hand = get_highest_hand(this.cards.concat(current_round.community));
-		var round_int = current_round.community.length - 2;
-		var min_bid = 1;
-		var max_bid = 1;
-		var max_match = 1;
-		var max_raise = 0;
-		var bid_list = [1, 10, 166, 322, 1599, 1609, 2467, 3325, 6185];
-		for (var x = 0, y = bid_list.length; x < y; x ++) {
-			if (best_hand.rank <= bid_list[x]) {
-				var z = 10 - x;
-				min_bid = Math.ceil(Math.pow(1.15, z) + (z / 3 * round_int) - 2);
-				max_bid = Math.ceil(Math.pow(1.5, z) + (z / 3 * round_int) + 1);
-				max_match = Math.ceil(Math.pow(1.1, z) + (z / 3 * round_int) + 2);
-				max_raise = Math.ceil(Math.pow(1.5, z - 3) + (z / 9 * round_int) + 1);
-				// console.log("min: " + min_bid + "\nmax: " + max_bid + "\nmatch: " + max_match + "\nraise: " + max_raise);
-				break;
-			}
-		}
-		var previous_bid = this.bid;
+		ctx = new Object();
+		ctx.my_possible = new TheoreticalHands();
+		ctx.my_possible.calculate(this.cards.concat(current_round.community));
+		// console.log("ctx.my_possible:");
+		// console.log(ctx.my_possible);
+		ctx.all_possible = new TheoreticalHands();
+		ctx.all_possible.calculate(current_round.community.concat([]));
+		// console.log("ctx.all_possible:");
+		// console.log(ctx.all_possible);
+		// var best_hand = get_highest_hand(this.cards.concat(current_round.community));
+		ctx.round_int = current_round.community.length - 2;
+		ctx.min_bid = 1;
+		ctx.max_bid = 1;
+		ctx.max_match = 5;
+		ctx.max_raise = 0;
+		ctx.previous_bid = this.bid;
+
+		// Follow neural rules
+		this.brain.fire();
+
+		// Create local vars from context
+		var round_int = ctx.round_int;
+		var min_bid = ctx.min_bid;
+		var max_bid = ctx.max_bid;
+		var max_match = ctx.max_match;
+		var max_raise = ctx.max_raise;
+		var previous_bid = ctx.previous_bid;
+		ctx = null;
+
+		// Actually bid
 		if (current_round.highestBid <= max_match || current_round.highestBid - this.bid <= max_raise) {
 			this.matchBid();
 		} else {

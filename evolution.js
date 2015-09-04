@@ -37,7 +37,7 @@ TheoreticalHands.prototype.calculate = function(cards) {
 		if (ranks.indexOf(cards[i].rank) != -1) continue;
 		ranks.push(cards[i].rank);
 	}
-	console.log(ranks);
+	// console.log(ranks);
 	unique_ranks = ranks.length;
 	// Like ranks (current)
 	var like_ranks = get_like_ranks(cards);
@@ -299,4 +299,186 @@ TheoreticalHands.prototype.calculate = function(cards) {
 			this.straight_flushes += p;
 		}
 	}
+}
+
+// It's alliiiiive!
+
+NeuralNetwork = function(json) {
+	var json = json || {};
+	this.name = json.name || "";
+	this.neurons = new Array();
+}
+
+NeuralNetwork.prototype.newCount = 0;
+
+NeuralNetwork.prototype.push = function(n) {
+	this.neurons.push(n);
+	if (this.name.length) {
+		localStorage.setItem("aleatory-neurons-for-" + this.name,
+			"[" + this.neurons.join(',') + "]");
+	}
+}
+
+NeuralNetwork.prototype.remove = function(n) {
+	this.neurons.splice(this.neurons.length - n);
+}
+
+NeuralNetwork.prototype.fire = function() {
+	for (var x = 0, y = this.neurons.length; x < y; ++ x) {
+		if (this.neurons[x].fire() === false) break;
+	}
+}
+
+Neuron = function(json) {
+	var json = json || {};
+	this.booleans = json.booleans || new Array();
+	this.actions = json.actions || new Array();
+}
+
+Neuron.prototype.check = function() {
+	for (var i = this.booleans.length; i --; ) {
+		if (!this.booleans[i].check()) return false;
+	}
+	return true;
+}
+
+Neuron.prototype.fire = function() {
+	if (!this.check()) return false;
+	for (var i = this.actions.length; i --; ) {
+		this.actions[i].execute();
+	}
+}
+
+Neuron.prototype.toString = function() {
+	var str = "new Neuron({";
+	str += "booleans:[" + this.booleans.join(',');
+	str += "],actions:[" + this.actions.join(',');
+	str += "]})";
+	return str;
+}
+
+NeuronBoolean = function(json) {
+	var json = json || {};
+	this.variable = json.variable || "true";
+	this.operator = json.operator || "==";
+	this.condition = json.condition || "true";
+}
+
+NeuronBoolean.prototype.check = function() {
+	return eval("ctx." + this.variable + this.operator + this.condition);
+}
+
+NeuronBoolean.prototype.toString = function() {
+	var str = "new NeuronBoolean({";
+	str += "variable:'" + this.variable;
+	str += "',operator:'" + this.operator;
+	str += "',condition:'" + this.condition;
+	str += "'})";
+	return str;
+}
+
+NeuronOr = function(booleans) {
+	this.booleans = booleans || new Array();
+}
+
+NeuronOr.prototype.check = function() {
+	for (var i = this.booleans; i --; ) {
+		if (this.booleans[i].check()) return true;
+	}
+	return false;
+}
+
+NeuronOr.prototype.toString = function() {
+	var str = "new NeuronOr([";
+	str += booleans.join(',');
+	str += "])";
+	return str;
+}
+
+NeuronAction = function(json) {
+	var json = json || {};
+	this.variable = json.variable || "var foo";
+	this.operator = json.operator || "=";
+	this.value = json.value || "null";
+}
+
+NeuronAction.prototype.execute = function() {
+	eval("ctx." + this.variable + this.operator + this.value);
+	eval("ctx." + this.variable + "=Math.floor(ctx." + this.variable +")");
+
+}
+
+NeuronAction.prototype.toString = function() {
+	var str = "new NeuronAction({";
+	str += "variable:'" + this.variable;
+	str += "',operator:'" + this.operator;
+	str += "',value:'" + this.value;
+	str += "'})";
+	return str;
+}
+
+// Generating neurons
+function generateRule() {
+	var booleans = new Array();
+	var actions = new Array();
+	for (var i = 1; i --; ) {
+		var bool, val, op, act_var, act_op, act_val;
+		if (irandom(10)) {
+			bool = choose("round_int", "previous_bid");
+			if (bool == "round_int") {
+				val = irandom_range(1, 4);
+			} else {
+				val = irandom_range(1, current_round.highestBid + 5);
+			}
+			op = choose("<", "<=", "==", ">=", ">");
+			act_var = choose("min_bid", "max_bid", "max_match", "max_raise"); 
+			act_op = choose("=", "+=", "*=");
+			switch (act_op) {
+				case "*=": act_val = '' + (0.1 * choose(irandom_range(2, 9),
+					irandom_range(11, 18))); break;
+				case "+=": act_val = irandom_range(1, 8); break;
+				default: act_val = irandom_range(1, 10); break;
+			}
+		} else {
+			var my = !!irandom(2);
+			var start = (my ? "my_" : "all_") + "possible.";
+			bool = choose("pairs", "two_pairs", "threes", "straights", "flushes",
+					"full_houses", "fours", "straight_flushes");
+			if (irandom(2)) {
+				bool = start + bool;
+				val = irandom_range(0, eval(start + "any"));
+				op = choose("<", ">");
+				act_var = choose("min_bid", "max_bid", "max_match", "max_raise"); 
+				act_op = choose("=", "+=", "*=");
+				switch (act_op) {
+					case "*=": act_val = '' + (0.1 * choose(irandom_range(2, 9),
+						irandom_range(11, 18))); break;
+					case "+=": act_val = irandom_range(1, 8); break;
+					default: act_val = irandom_range(1, 10); break;
+				}
+			} else {
+				val = (!my ? "my_" : "all_") + "possible." + bool;
+				if (irandom(5)) val += "-" + irandom_range(4, 3500);
+				op = ">";
+				act_var = choose("min_bid", "max_bid", "max_match", "max_raise");
+				act_op = "+=";
+				act_val = irandom_range(1, 10);
+			}
+		}
+		// Add condition and action
+		booleans.push(new NeuronBoolean({
+			variable: bool,
+			operator: op,
+			condition: '' + val
+		}));
+		actions.push(new NeuronAction({
+			variable: act_var,
+			operator: act_op,
+			value: '' + act_val
+		}));
+	}
+	return new Neuron({
+		booleans: booleans,
+		actions: actions
+	});
 }
