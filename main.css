@@ -585,8 +585,10 @@ body:not(.webkit) .chip::after {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	width: 3.6923em;
-	height: 1.8461em;
+	min-height: 1.8461em;
 	position: absolute;
+	left: calc(50% - 1.8461em);
+	top: calc(50% - 0.9230em);
 	padding: 0.3076em;
 	border-radius: 0.1538em;
 	background-color: white;
@@ -604,6 +606,14 @@ body:not(.webkit) .chip::after {
 	-webkit-transition: left 2s, top 2s, opacity 0.5s ease 1s;
 	-moz-transition: left 2s, top 2s, opacity 0.5s ease 1s;
 	-o-transition: left 2s, top 2s, opacity 0.5s ease 1s;
+}
+
+.modal.from-left {
+	left: calc(25% - 1.8461em);
+}
+
+.modal.from-right {
+	left: calc(75% - 1.8461em);
 }
 
 #speech-input {

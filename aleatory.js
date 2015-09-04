@@ -475,14 +475,7 @@ function Modal(m) {
 		elem.className += " webkit";
 	}
 	elem.innerHTML = m.text;
-	var ofst_left = -96;
-	var ofst_top = -48;
-	switch (m.from || "") {
-		case "left": elem.style.left = (16 - ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
-		case "right": elem.style.right = (16 - ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
-		case "left": elem.style.left = (window.innerWidth / 2 - ofst_left) + "px"; elem.style.bottom = (16 - ofst_top) + "px"; break;
-		default: elem.style.left = (window.innerWidth / 2 + ofst_left) + "px"; elem.style.top = (window.innerHeight / 2 + ofst_top) + "px"; break;
-	}
+	elem.className += " from-" + m.from;
 	document.body.appendChild(elem);
 	setTimeout(function() {
 		elem.style.opacity = "0";
