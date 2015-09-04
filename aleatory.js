@@ -550,9 +550,14 @@ function Round() {
 			var health = hands[i].money - hands[i].lastMoney;
 			hands[i].lastMoney = hands[i].money;
 			console.log("Hand " + i + " health was " + health);
-			if (health < -2) {
-				hands[i].brain.remove(hands[i].brain.newCount);
+			if (health >= 2) {
+				hands[i].brain.goodRound(health);
+			} else if (health < -2) {
+				// hands[i].brain.remove(hands[i].brain.newCount);
+				hands[i].brain.badRound();
+				if (health < -5) hands[i].brain.badRound();
 			}
+			hands[i].brain.recentlyUsed.splice(0);
 			hands[i].brain.newCount = 0;
 			// Add new neurons
 			for (var n = irandom_range(1, 3); n --; ) {
@@ -788,7 +793,7 @@ function Hand(h) {
 		var h = new Object();
 	}
 	this.cards = new Array();
-	this.lastMoney = this.money = 50;
+	this.lastMoney = this.money = 500;
 	this.brain = new NeuralNetwork({
 		name: h.name
 	});
@@ -940,7 +945,7 @@ function Hand(h) {
 		ctx.min_bid = 1;
 		ctx.max_bid = 1;
 		ctx.max_match = 5;
-		ctx.max_raise = 0;
+		ctx.max_raise = 4;
 		ctx.previous_bid = this.bid;
 
 		// Follow neural rules

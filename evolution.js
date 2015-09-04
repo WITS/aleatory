@@ -307,6 +307,7 @@ NeuralNetwork = function(json) {
 	var json = json || {};
 	this.name = json.name || "";
 	this.neurons = new Array();
+	this.recentlyUsed = new Array();
 }
 
 NeuralNetwork.prototype.newCount = 0;
@@ -325,7 +326,22 @@ NeuralNetwork.prototype.remove = function(n) {
 
 NeuralNetwork.prototype.fire = function() {
 	for (var x = 0, y = this.neurons.length; x < y; ++ x) {
-		if (this.neurons[x].fire() === false) break;
+		if (this.neurons[x].fire()) {
+			this.recentlyUsed.push(this.neurons[x]);
+		} 
+	}
+}
+
+NeuralNetwork.prototype.goodRound = function(x) {
+	for (var i = this.recentlyUsed.length; i --; ) {
+		this.recentlyUsed[i].damage == Math.floor(x * 0.5);
+	}
+}
+
+NeuralNetwork.prototype.badRound = function() {
+	for (var i = this.recentlyUsed.length; i --; ) {
+		if (++ this.recentlyUsed[i].damage >= 5) this.neurons.splice(
+			this.neurons.indexOf(this.recentlyUsed[i]), 1);
 	}
 }
 
@@ -339,6 +355,8 @@ Neuron = function(json) {
 	this.actions = json.actions || new Array();
 }
 
+Neuron.prototype.damage = 0;
+
 Neuron.prototype.check = function() {
 	for (var i = this.booleans.length; i --; ) {
 		if (!this.booleans[i].check()) return false;
@@ -351,6 +369,7 @@ Neuron.prototype.fire = function() {
 	for (var i = this.actions.length; i --; ) {
 		this.actions[i].execute();
 	}
+	return true;
 }
 
 Neuron.prototype.toString = function() {
@@ -448,8 +467,7 @@ function generateRule() {
 			var start = (my ? "my_" : "all_") + "possible.";
 			bool = choose("pairs", "two_pairs", "threes", "straights", "flushes",
 					"full_houses", "fours", "straight_flushes");
-			if (irandom(5)) {
-				bool = start + bool;
+			if (!irandom(5)) {
 				val = irandom_range(0, 300000);
 				op = choose("<", ">");
 				act_var = choose("min_bid", "max_bid", "max_match", "max_raise"); 
@@ -461,13 +479,14 @@ function generateRule() {
 					default: act_val = irandom_range(1, 10); break;
 				}
 			} else {
-				val = (!my ? "my_" : "all_") + "possible." + bool;
+				val = "ctx." + (!my ? "my_" : "all_") + "possible." + bool;
 				if (irandom(5)) val += (my ? "-" : "+") + irandom_range(4, 3500);
 				op = (my ? ">" : "<");
-				act_var = choose("min_bid", "max_bid", "max_match", "max_raise");
+				act_var = choose("max_bid", "min_bid", "max_match", "max_raise");
 				act_op = "+=";
-				act_val = irandom_range(1, 10);
+				act_val = irandom_range(1, 15);
 			}
+			bool = start + bool;
 		}
 		// Add condition and action
 		booleans.push(new NeuronBoolean({
