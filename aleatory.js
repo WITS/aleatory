@@ -899,9 +899,14 @@ function Hand(h) {
 		if (this == player) {
 			return;
 		}
-		var possible = new TheoreticalHands();
-		possible.calculate(this.cards.concat(current_round.community));
-		console.log(possible);
+		var my_possible = new TheoreticalHands();
+		my_possible.calculate(this.cards.concat(current_round.community));
+		console.log("my_possible:");
+		console.log(my_possible);
+		var all_possible = new TheoreticalHands();
+		all_possible.calculate(current_round.community.concat([]));
+		console.log("all_possible:");
+		console.log(all_possible);
 		var best_hand = get_highest_hand(this.cards.concat(current_round.community));
 		var round_int = current_round.community.length - 2;
 		var min_bid = 1;
