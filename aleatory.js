@@ -548,6 +548,7 @@ function Round() {
 			// This is just early testing
 			// Evaluate performance
 			var health = hands[i].money - hands[i].lastMoney;
+			hands[i].lastMoney = hands[i].money;
 			console.log("Hand " + i + " health was " + health);
 			if (health < -2) {
 				hands[i].brain.remove(hands[i].brain.newCount);
@@ -788,7 +789,9 @@ function Hand(h) {
 	}
 	this.cards = new Array();
 	this.lastMoney = this.money = 50;
-	this.brain = new NeuralNetwork();
+	this.brain = new NeuralNetwork({
+		name: h.name
+	});
 	this.lastBid = this.bid = 0;
 	this.staying = false;
 	this.folded = false;

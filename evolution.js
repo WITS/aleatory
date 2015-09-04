@@ -329,6 +329,10 @@ NeuralNetwork.prototype.fire = function() {
 	}
 }
 
+NeuralNetwork.prototype.toString = function() {
+	return this.neurons.join(',');
+}
+
 Neuron = function(json) {
 	var json = json || {};
 	this.booleans = json.booleans || new Array();
@@ -423,7 +427,7 @@ function generateRule() {
 	var actions = new Array();
 	for (var i = 1; i --; ) {
 		var bool, val, op, act_var, act_op, act_val;
-		if (irandom(10)) {
+		if (!irandom(15)) {
 			bool = choose("round_int", "previous_bid");
 			if (bool == "round_int") {
 				val = irandom_range(1, 4);
@@ -444,9 +448,9 @@ function generateRule() {
 			var start = (my ? "my_" : "all_") + "possible.";
 			bool = choose("pairs", "two_pairs", "threes", "straights", "flushes",
 					"full_houses", "fours", "straight_flushes");
-			if (irandom(2)) {
+			if (irandom(5)) {
 				bool = start + bool;
-				val = irandom_range(0, eval(start + "any"));
+				val = irandom_range(0, 300000);
 				op = choose("<", ">");
 				act_var = choose("min_bid", "max_bid", "max_match", "max_raise"); 
 				act_op = choose("=", "+=", "*=");
@@ -458,8 +462,8 @@ function generateRule() {
 				}
 			} else {
 				val = (!my ? "my_" : "all_") + "possible." + bool;
-				if (irandom(5)) val += "-" + irandom_range(4, 3500);
-				op = ">";
+				if (irandom(5)) val += (my ? "-" : "+") + irandom_range(4, 3500);
+				op = (my ? ">" : "<");
 				act_var = choose("min_bid", "max_bid", "max_match", "max_raise");
 				act_op = "+=";
 				act_val = irandom_range(1, 10);
