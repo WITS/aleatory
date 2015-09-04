@@ -54,7 +54,7 @@ window.addEventListener("load", function() {
 		position: "right"
 	}));
 	document.body.style.cursor = "pointer";
-	document.body.addEventListener("click", function() {
+	window.addEventListener("click", function() {
 		if (document.getElementById("menu-wrapper").style.opacity != "0") {
 			document.body.style.cursor = "";
 			document.getElementById("menu-wrapper").style.opacity = "0";
