@@ -204,6 +204,17 @@ body.mobile #menu .tagline::before {
 	display: inline-block;
 	padding-left: 0.6em;
 }
+
+#results > div.text > strong {
+	padding: 0 0.5em;
+	margin: 0 0.1em;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+#results > div.text > strong + * {
+	padding-left: 0;
+}
+
 #results > div.text > span {
 	opacity: 0.4;
 }

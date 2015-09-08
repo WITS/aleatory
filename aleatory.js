@@ -788,7 +788,7 @@ function Hand(h) {
 	this.cards = new Array();
 	this.lastMoney = this.money = 500;
 	this.brain = new NeuralNetwork({
-		name: h.name
+		name: h.position
 	});
 	this.lastBid = this.bid = 0;
 	this.staying = false;
