@@ -307,6 +307,10 @@ NeuralNetwork = function(json) {
 	var json = json || {};
 	this.name = json.name || "";
 	this.neurons = new Array();
+	if (this.name != "") {
+		var stor = localStorage.getItem("aleatory-neurons-for-" + this.name);
+		if (stor != null) this.neurons = eval(stor);
+	}
 	this.recentlyUsed = new Array();
 }
 
@@ -314,9 +318,10 @@ NeuralNetwork.prototype.newCount = 0;
 
 NeuralNetwork.prototype.push = function(n) {
 	this.neurons.push(n);
-	if (this.name.length) {
+	var str = this.neurons.join(',');
+	if (this.name.length && str.length <= 1e7) {
 		localStorage.setItem("aleatory-neurons-for-" + this.name,
-			"[" + this.neurons.join(',') + "]");
+			"[" + str + "]");
 	}
 }
 
@@ -483,8 +488,13 @@ function generateRule() {
 				if (irandom(5)) val += (my ? "-" : "+") + irandom_range(4, 3500);
 				op = (my ? ">" : "<");
 				act_var = choose("max_bid", "min_bid", "max_match", "max_raise");
-				act_op = "+=";
-				act_val = irandom_range(1, 15);
+				act_op = choose("=", "-=", "+=", "*=");
+				if (act_op == "*=") {
+					act_val = '' + (0.1 * choose(irandom_range(2, 9),
+						irandom_range(11, 18)));
+				} else {
+					act_val = irandom_range(1, 15);
+				}
 			}
 			bool = start + bool;
 		}
