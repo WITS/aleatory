@@ -10,6 +10,12 @@ IS_WEBKIT = (IS_CHROME || IS_SAFARI || IS_OPERA);
 IS_MSIE = (/\bMSIE\b/i.test(userAgent));
 // IS_EDGE?
 
+if (IS_MOBILE && IS_SAFARI) {
+	document.ontouchmove = function(event){
+		event.preventDefault();
+	}
+}
+
 window.addEventListener("load", function() {
 	// UserAgent body classes
 	var classes = new Array();
@@ -54,14 +60,16 @@ window.addEventListener("load", function() {
 		position: "right"
 	}));
 	document.body.style.cursor = "pointer";
-	window.addEventListener("click", function() {
+	var init_game = function() {
 		if (document.getElementById("menu-wrapper").style.opacity != "0") {
 			document.body.style.cursor = "";
 			document.getElementById("menu-wrapper").style.opacity = "0";
 			current_round = new Round();
 			current_round.start();
 		}
-	});
+	};
+	window.addEventListener("click", init_game);
+	document.body.addEventListener("click", init_game);
 
 	SpeechInfo = {
 		lastCommand: {
