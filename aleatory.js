@@ -537,7 +537,7 @@ function Round() {
 
 		// Brain development
 		for (var i = hands.length; i --; ) {
-			if (hands[i] == player) continue;
+			if (hands[i] == player && !player.canAutoBid) continue;
 			// This is just early testing
 			// Evaluate performance
 			var health = hands[i].money - hands[i].lastMoney;
@@ -553,7 +553,7 @@ function Round() {
 			hands[i].brain.recentlyUsed.splice(0);
 			hands[i].brain.newCount = 0;
 			// Add new neurons
-			for (var n = irandom_range(1, 3); n --; ) {
+			for (var n = irandom_range(1, 10); n --; ) {
 				hands[i].brain.push(generateRule());
 				++ hands[i].brain.newCount;
 			}
@@ -709,7 +709,7 @@ function Round() {
 				this.next_bidder();
 				return;
 			}
-			if (this.hands[this.current_bidder] == player) {
+			if (this.hands[this.current_bidder] == player && !player.canAutoBid) {
 				bid_buttons_set_active(true);
 				SpeechInfo.awaitingCommand = true;
 				this.canBid = true;
@@ -790,6 +790,7 @@ function Hand(h) {
 	this.brain = new NeuralNetwork({
 		name: h.position
 	});
+	this.canAutoBid = h.canAutoBid || false;
 	this.lastBid = this.bid = 0;
 	this.staying = false;
 	this.folded = false;
@@ -839,7 +840,7 @@ function Hand(h) {
 	}
 	this.check = function() {
 		this.checking = true;
-		if (this != player) {
+		if (this != player || this.canAutoBid) {
 			var raise = (this.bid - this.lastBid);
 			if (raise <= 0) {
 				new Modal({
@@ -871,6 +872,8 @@ function Hand(h) {
 	this.raiseBid = function(x) {
 		var x = x || 1;
 		x = Math.min(x, this.money);
+		var t = x % 5;
+		// if (x >= 5) ++ t;
 		this.money -= x;
 		this.bid += x;
 		current_round.pot += x;
@@ -881,11 +884,11 @@ function Hand(h) {
 		for (var y = 0; y < x; y ++) {
 			setTimeout(function() {
 				new Chip(_this.position);
-			}, y * 500);
+			}, (y >= x - 4 ? x - y : 0) * 500);
 		}
 		setTimeout(function() {
 			_this.bidding = false;
-		}, x * 500);
+		}, t * 500);
 		if (current_round.highestBid < this.bid) {
 			current_round.highestBid = this.bid;
 			current_round.raised = true;
@@ -904,7 +907,7 @@ function Hand(h) {
 	this.fold = function() {
 		this.folded = true;
 		current_round.next_bidder();
-		if (this == player) {
+		if (this == player && !this.canAutoBid) {
 			// Hide the bidding buttons
 			for (var x = 0, elems = document.getElementById("player").children, y = elems.length; x < y; x ++) {
 				if (elems[x].classList.contains("bid-button")) {
@@ -921,7 +924,7 @@ function Hand(h) {
 		}
 	}
 	this.auto_bid = function() {
-		if (this == player) {
+		if (this == player && !this.canAutoBid) {
 			return;
 		}
 		ctx = new Object();
@@ -952,6 +955,11 @@ function Hand(h) {
 		var max_raise = ctx.max_raise;
 		var previous_bid = ctx.previous_bid;
 		ctx = null;
+
+		// Call bullshit
+		if (current_round.highestBid - this.bid >= 150) {
+			this.matchBid();
+		}
 
 		// Actually bid
 		if (current_round.highestBid <= max_match || current_round.highestBid - this.bid <= max_raise) {
@@ -985,7 +993,7 @@ function Hand(h) {
 		if (raise3) {
 			setTimeout(function() {
 				_this.check();
-			}, (raise3 + 2) * 500);
+			}, (raise3 % 5 + 2) * 500);
 		} else {
 			this.check();
 		}
@@ -1078,15 +1086,13 @@ function display_winners(w) {
 	var bidRight = _this2.element();
 	bidRight.style.left = "132px";
 	document.getElementById("player").appendChild(bidRight);
-	//
-	// BEGIN USELESS SHIT I NEED TO REMOVE
-	//
-	/*setTimeout(function() {
-		_this2.onclick();
-	}, 5000);*/
-	//
-	// END USELESS SHIT
-	//
+	
+	if (player.canAutoBid) {
+		setTimeout(function() {
+			_this2.onclick();
+		}, 5000);
+	}
+
 	current_round.showingResults = true;
 	current_round.canBid = true;
 	update_bg_color();
